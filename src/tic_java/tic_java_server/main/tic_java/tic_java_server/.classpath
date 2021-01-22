@@ -6,8 +6,5 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="C:/xampp/htdocs/testenv/Tic_Online/src/tic_java/lib/WebSocket/Java-WebSocket-1.5.1.jar"/>
-	<classpathentry kind="lib" path="C:/xampp/htdocs/testenv/Tic_Online/src/tic_java/lib/slf4j/slf4j-api-1.7.9.jar"/>
-	<classpathentry kind="lib" path="C:/xampp/htdocs/testenv/Tic_Online/src/tic_java/lib/slf4j/slf4j-jdk14-1.7.9.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

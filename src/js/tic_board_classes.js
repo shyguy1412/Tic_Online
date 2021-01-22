@@ -13,19 +13,35 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>. */
+class Field {
+  static radius = 20;
 
-html{
-  background-color: grey;
+  constructor(x, y, ID) {
+    this.ID = ID;
+    this.occupant = null;
+    this.pos = {
+      x: x,
+      y: y
+    };
+  }
+
+  static setDrawOptions(){
+    stroke(0);
+    strokeWeight(1);
+    fill(150, 150, 150, 60);
+  }
+
+  static render(fields){
+    Field.setDrawOptions();
+    fields.forEach((field) => {
+      ellipse(field.pos.x, field.pos.y, Field.radius, Field.radius);
+    });
+  }
 }
 
-h1{
-  text-align: center;
-}
-
-#board_wrapper canvas {
-    padding-left: 0;
-    padding-right: 0;
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
+class Area{
+  constructor(id){
+    this.ID = id;
+    this.fields = [];
+  }
 }

@@ -13,3 +13,20 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>. */
+
+var connection = new WebSocket('ws://localhost:4444');
+
+// When the connection is open, send some data to the server
+connection.onopen = function () {
+  connection.send('Ping'); // Send the message 'Ping' to the server
+};
+
+// Log errors
+connection.onerror = function (error) {
+  console.log('WebSocket Error ' + error);
+};
+
+// Log messages from the server
+connection.onmessage = function (e) {
+  console.log('Server: ' + e.data);
+};

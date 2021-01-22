@@ -24,9 +24,18 @@
   <meta name="author" content="Nils Ramstöck">
 
   <link rel="stylesheet" href="css/styles.css">
-  <script src="js/scripts.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.2.0/p5.min.js"></script>
+  <script src="js/connection.js"></script>
+  <script src="js/tic_board_classes.js"></script>
+  <script src="js/tic_board_functions.js"></script>
+  <script src="js/tic_board.js"></script>
 </head>
 <body>
   <h1>Tic Online</h1>
-</body>
+  <main>
+    <div  id="board_wrapper">
+
+    </div>
+  </main>
+  </body>
 </html>
