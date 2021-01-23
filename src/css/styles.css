@@ -21,6 +21,9 @@ html{
 h1{
   text-align: center;
 }
+.main_wrapper{
+  text-align: center;
+}
 
 #board_wrapper canvas {
     padding-left: 0;

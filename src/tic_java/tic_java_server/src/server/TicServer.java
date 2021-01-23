@@ -25,6 +25,8 @@ import java.util.Set;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
+import org.json.JSONObject;
+
 /**
  * 
  * @author Nils Ramstöck
@@ -33,53 +35,69 @@ import org.java_websocket.server.WebSocketServer;
 public class TicServer extends WebSocketServer {
 
 	public static void main(String[] args) {
-    	TicServer server = new TicServer();
-    	server.start();
-    }
+		TicServer server = new TicServer();
+		server.start();
+	}
 
+	private static int TCP_PORT = 4444;
 
-    private static int TCP_PORT = 4444;
+	private TicClientSet conns;
 
-    private Set<WebSocket> conns;
-    
-    public TicServer() {
-        super(new InetSocketAddress(TCP_PORT));
-        conns = new HashSet<>();
-    }
+	public TicServer() {
+		super(new InetSocketAddress(TCP_PORT));
+		conns = new TicClientSet();
+	}
 
-    @Override
-    public void onOpen(WebSocket conn, ClientHandshake handshake) {
-        conns.add(conn);
-        System.out.println("New connection from " + conn.getRemoteSocketAddress().getAddress().getHostAddress());
-    }
+	@Override
+	public void onOpen(WebSocket conn, ClientHandshake handshake) {
+		TicClient client = new TicClient();
+		client.socket = conn;
+		conns.add(client);
+		System.out.println("New connection from " + conn.getRemoteSocketAddress().getAddress().getHostAddress());
+	}
 
-    @Override
-    public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-        conns.remove(conn);
-        System.out.println("Closed connection to " + conn.getRemoteSocketAddress().getAddress().getHostAddress());
-    }
+	@Override
+	public void onMessage(WebSocket conn, String message) {
+		JSONObject data = new JSONObject(message);
+		TicClient client = conns.getClientFromConnection(conn);
+		
+		System.out.println("Message from client: " + data);
 
-    @Override
-    public void onMessage(WebSocket conn, String message) {
-        System.out.println("Message from client: " + message);
-        for (WebSocket sock : conns) {
-            sock.send(message);
-        }
-    }
+		
+		switch (data.getString("action")) {
+		case "innit":
+			client.userID = data.getString("user_id");
+			client.roomCode = data.getString("room_code");
+			break;
+		case "msg_global":
+			TicClient room[] = conns.getClientsInRoom(client.roomCode);
+			System.out.println(room.length);
+			for(TicClient c : room) {
+				c.socket.send(data.getJSONObject("msg").toString());
+			}
+			break;
+		}
+	}
 
-    @Override
-    public void onError(WebSocket conn, Exception ex) {
-        //ex.printStackTrace();
-        if (conn != null) {
-            conns.remove(conn);
-            // do some thing if required
-        }
-        System.out.println("ERROR from " + conn.getRemoteSocketAddress().getAddress().getHostAddress());
-    }
+	@Override
+	public void onError(WebSocket conn, Exception ex) {
+		// ex.printStackTrace();
+		if (conn != null) {
+			conns.remove(conn);
+			// do some thing if required
+		}
+		System.out.println("ERROR from " + conn.getRemoteSocketAddress().getAddress().getHostAddress());
+	}
+
+	@Override
+	public void onClose(WebSocket conn, int code, String reason, boolean remote) {
+		conns.remove(conn);
+		System.out.println("Closed connection to " + conn.getRemoteSocketAddress().getAddress().getHostAddress());
+	}
 
 	@Override
 	public void onStart() {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

@@ -13,11 +13,12 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>. */
+
 class Field {
   static radius = 20;
 
-  constructor(x, y, ID) {
-    this.ID = ID;
+  constructor(x, y, id) {
+    this.id = id;
     this.occupant = null;
     this.pos = {
       x: x,
@@ -34,14 +35,29 @@ class Field {
   static render(fields){
     Field.setDrawOptions();
     fields.forEach((field) => {
+      push();
+      if(field.occupant != null){
+        fill(field.occupant.color.r, field.occupant.color.g, field.occupant.color.b);
+      }
       ellipse(field.pos.x, field.pos.y, Field.radius, Field.radius);
+      pop();
     });
   }
 }
 
 class Area{
   constructor(id){
-    this.ID = id;
+    this.id = id;
     this.fields = [];
+  }
+
+  place(marble){
+    this.fields.forEach((f) => {
+      if(f.id == marble.pos.id){
+        f.occupant = marble;
+        console.log("MARBLE PLACED AT: " + this.id + ":"+ marble.pos.id)
+        console.log(f);
+      }
+    });
   }
 }

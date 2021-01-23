@@ -13,7 +13,9 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>. */
-function createHomeFields(arr) {
+
+
+function createhomeAreas(arr) {
   let positions = [
     {x:width*0.5, y:height*0.25},
     {x:width*0.75,y:height*0.5},
@@ -21,7 +23,7 @@ function createHomeFields(arr) {
     {x:width*0.25,y:height*0.5},
   ]
   for(let i = 0; i < 4; i++){
-    let home = new Area("home_" + i);
+    let home = new Area("homeArea_" + i);
     let x = positions[i].x;
     let y = positions[i].y;
     createFieldsArc(x, y, 50, 4, home.fields, 240, 90*i);
@@ -29,7 +31,7 @@ function createHomeFields(arr) {
   }
 }
 
-function createStartFields(arr){
+function createstartAreas(arr){
   let positions = [
     {x:width*0.125, y:height*0.125},
     {x:width*0.875,y:height*0.125},
@@ -37,13 +39,14 @@ function createStartFields(arr){
     {x:width*0.125,y:height*0.875},
   ]
   for(let i = 0; i < 4; i++){
-    let start = new Area("start_" + i);
+    let start = new Area("startArea_" + i);
     let x = positions[i].x;
     let y = positions[i].y;
-    createFieldsArc(x, y, 35, 4, start.fields, 360, 90*i);
+    createFieldsArc(x, y, 35, 4, start.fields, 360);
     arr.push(start);
   }
 }
+
 
 function createFieldsArc(x, y, r, amt, arr,  angle=360, angleOff=0){
   for(let i = 0; i < amt; i++){

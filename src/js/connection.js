@@ -16,9 +16,61 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 var connection = new WebSocket('ws://localhost:4444');
 
+//TEST DATA//
+var m1 = {
+  color: {r:255, g:0, b:0},
+  pos  : {area:"playingArea", id: 30}
+};
+
+var m2 = {
+  color: {r:0, g:255, b:0},
+  pos  : {area:"homeArea_1", id: 2}
+};
+
+var m3 = {
+  color: {r:0, g:0, b:255},
+  pos  : {area:"startArea_3", id: 3}
+};
+
+var m4 = {
+  color: {r:255, g:255, b:0},
+  pos  : {area:"homeArea_2", id: 2}
+};
+
+// connection.send(JSON.stringify(m1)); // Send the message 'Ping' to the server
+// connection.send(JSON.stringify(m2)); // Send the message 'Ping' to the server
+// connection.send(JSON.stringify(m3)); // Send the message 'Ping' to the server
+// connection.send(JSON.stringify(m4)); // Send the message 'Ping' to the server
+
 // When the connection is open, send some data to the server
+
+connection.sendJSON = function(json){
+  var strData = JSON.stringify(json);
+  connection.send(strData);
+  console.log("CLIENT: " + strData);
+}
+
+connection.sendChatMessage = function(msg){
+  var data = {
+    action: "msg_global",
+    msg: {
+      username: client_username,
+      user_id: user_id,
+      room_code: room_code,
+      text: msg
+    }
+  }
+  connection.sendJSON(data);
+}
+
 connection.onopen = function () {
-  connection.send('Ping'); // Send the message 'Ping' to the server
+  //INIT CONNECTION
+  var data = {
+    action: "innit",
+    user_id: user_id,
+    room_code: room_code
+  };
+  connection.sendJSON(data);
 };
 
 // Log errors
@@ -28,5 +80,28 @@ connection.onerror = function (error) {
 
 // Log messages from the server
 connection.onmessage = function (e) {
-  console.log('Server: ' + e.data);
+  console.log('SERVER: ' + e.data);
+  let data = JSON.parse(e.data);
+  switch (data.pos.area.split("_")[0]) {
+    case "playingArea":
+    console.log("PLAYING AREA");
+    playingArea.place(data);
+    break;
+    case "startArea":
+    console.log("START");
+    startAreas.forEach((area) => {
+      if(area.id == data.pos.area){
+        area.place(data);
+      }
+    });
+    break;
+    case "homeArea":
+    console.log("HOME");
+    homeAreas.forEach((area) => {
+      if(area.id == data.pos.area){
+        area.place(data);
+      }
+    });
+    break;
+  }
 };

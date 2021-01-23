@@ -13,32 +13,40 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>. */
-let playingFields;
-let homeFields = [];
-let startFields = [];
+
+let playingArea;
+let homeAreas = [];
+let startAreas = [];
 
 function setup() {
   let c_size = calc_canvas_size();
   createCanvas(c_size, c_size).parent("board_wrapper");
   //PLAYING FIELD//
-  playingFields = new Area("playingField");
-  createFieldsArc(width*0.5, height*0.5, width*0.5 - 60, 60, playingFields.fields);
-  createHomeFields(homeFields);
-  createStartFields(startFields);
+  playingArea = new Area("playingField");
+  createFieldsArc(width*0.5, height*0.5, width*0.5 - 60, 60, playingArea.fields);
+
+  //HOME AREAS
+  createhomeAreas(homeAreas);
+
+  //START AREAS
+  createstartAreas(startAreas);
 }
 
 function draw() {
   background(255, 134, 89);
+  /// HELPER LINES
   stroke(0);
   strokeWeight(1);
   line(width*0.5, 0, width*0.5, height);
   line(0, height*0.5, width, height*0.5);
+  ///////////////////////////////////////
 
-  Field.render(playingFields.fields);
-  homeFields.forEach((h) => {
+  ///RENDERING///
+  Field.render(playingArea.fields);
+  homeAreas.forEach((h) => {
     Field.render(h.fields)
   });
-  startFields.forEach((h) => {
+  startAreas.forEach((h) => {
     Field.render(h.fields)
   });
 
