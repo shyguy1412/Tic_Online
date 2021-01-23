@@ -47,6 +47,32 @@ function createstartAreas(arr){
   }
 }
 
+function updateBoard(data){
+  for(marble of data){
+    switch (marble.pos.area.split("_")[0]) {
+      case "playingArea":
+      console.log("PLAYING AREA");
+      playingArea.place(marble);
+      break;
+      case "startArea":
+      console.log("START");
+      startAreas.forEach((area) => {
+        if(area.id == marble.pos.area){
+          area.place(marble);
+        }
+      });
+      break;
+      case "homeArea":
+      console.log("HOME");
+      homeAreas.forEach((area) => {
+        if(area.id == marble.pos.area){
+          area.place(marble);
+        }
+      });
+      break;
+    }
+  }
+}
 
 function createFieldsArc(x, y, r, amt, arr,  angle=360, angleOff=0){
   for(let i = 0; i < amt; i++){

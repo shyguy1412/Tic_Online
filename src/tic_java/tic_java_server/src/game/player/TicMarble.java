@@ -4,6 +4,9 @@ public class TicMarble {
 	
 	private int id;
 	
+	public String area;
+	public int pos;
+	
 	TicMarble(int _id){
 		id = _id;
 	}

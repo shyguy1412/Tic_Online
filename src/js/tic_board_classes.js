@@ -37,7 +37,10 @@ class Field {
     fields.forEach((field) => {
       push();
       if(field.occupant != null){
-        fill(field.occupant.color.r, field.occupant.color.g, field.occupant.color.b);
+        let r = colorScheme[field.occupant.player_id].r;
+        let g = colorScheme[field.occupant.player_id].g;
+        let b = colorScheme[field.occupant.player_id].b;
+        fill(r, g, b);
       }
       ellipse(field.pos.x, field.pos.y, Field.radius, Field.radius);
       pop();

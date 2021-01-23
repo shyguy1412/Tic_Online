@@ -3,11 +3,11 @@ function showError(msg, id){
 }
 
 function checkRoomcode(){
-  var username = document.getElementById('username_field').value
+  var room_code = document.getElementById('room_code_field').value
   var nameRegex = /^[a-zA-Z0-9]+$/;
-  var nameValid = username.match(nameRegex);
+  var nameValid = room_code.match(nameRegex);
 
-  if(!username.replace(/\s/g, '').length){
+  if(!room_code.replace(/\s/g, '').length){
     showError("Roomcode cannot be empty!", "roomcode_error_field");
   }else if(nameValid == null){
     showError("Invalid Roomcode", "roomcode_error_field");

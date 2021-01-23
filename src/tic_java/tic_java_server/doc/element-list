@@ -1,1 +1,4 @@
 game
+game.board
+game.player
+server

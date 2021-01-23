@@ -32,7 +32,7 @@ public class TicClientSet extends HashSet<TicClient>{
 
 	/**
 	 * Finds all clients in a certain room
-	 * @param roomCode
+	 * @param roomCode Searched Roomcode
 	 * @return All clients in that room
 	 */
 	public TicClient[] getClientsInRoom(String roomCode) {

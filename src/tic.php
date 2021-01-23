@@ -42,6 +42,8 @@ header('Location: http://localhost/testenv/Tic_Online/src/index.php/?room_code='
   <main>
     <div id="board_wrapper">
     </div>
+    <div id="interface_wrapper">
+    </div>
   </main>
 </body>
 <script>

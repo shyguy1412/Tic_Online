@@ -69,7 +69,7 @@ function enterRoom(){
 
   xhr.onload = function(){
     var data = JSON.parse(this.responseText);
-    console.log(data);
+    console.log(this.responseText);
     if(data.success == "false"){
       showError(data.msg, "roomcode_error_field");
       return;

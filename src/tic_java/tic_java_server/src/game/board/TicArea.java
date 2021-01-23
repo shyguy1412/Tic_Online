@@ -9,8 +9,8 @@ public class TicArea {
 		id = _id;
 		
 		fields = new TicField[amtFields];
-		for(int i = 0; i > amtFields; i++) {
-			fields[i] = new TicField(i);
+		for(int i = 0; i < amtFields; i++) {
+			fields[i] = new TicField(i, id);
 		}
 	}
 	

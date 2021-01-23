@@ -68,30 +68,15 @@ public class TicServer extends WebSocketServer {
 		System.out.println("Message from client: " + data);
 
 		switch (data.getString("action")) {
-		case "innit":
-			client.userID = data.getString("user_id");
-			client.roomCode = data.getString("room_code");
-			boolean found = false;
-			for (TicGame g : games) {
-				if (g.getRoomCode().equals(client.roomCode)) {
-					if (!g.addPlayer(client)) {
-						//Tell player game is full
-					}
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				games.add(new TicGame(client.roomCode));
-			}
-
+		case "init":
+			this.initClient(client, data);
+			System.out.println();
 			break;
 		case "msg_global":
-			TicClient room[] = conns.getClientsInRoom(client.roomCode);
-			System.out.println(room.length);
-			for (TicClient c : room) {
-				c.socket.send(data.getJSONObject("msg").toString());
-			}
+			this.sendGlobalMessage(client, data);
+			break;
+		case "team_select":
+			client.player.game.selectTeam(client, data.getInt("team_id"));
 			break;
 		}
 	}
@@ -116,5 +101,51 @@ public class TicServer extends WebSocketServer {
 	public void onStart() {
 		// TODO Auto-generated method stub
 
+	}
+
+	/**
+	 * 
+	 * @param client Client to be Initilised
+	 * @param data   Initialisation Data
+	 */
+	private void initClient(TicClient client, JSONObject data) {
+		client.userID = data.getString("user_id");
+		client.roomCode = data.getString("room_code");
+		boolean found = false;
+		for (TicGame g : games) {
+			if (g.getRoomCode().equals(client.roomCode)) {
+				if (!g.addPlayer(client)) {
+					System.out.println("GAME IS FULL: " + client.roomCode);
+				}
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			TicGame game = new TicGame(client.roomCode);
+			games.add(game);
+			if (!game.addPlayer(client)) {
+				System.out.println("GAME IS FULL: " + client.roomCode);
+			}
+		}
+		JSONObject responseData = new JSONObject();
+		responseData.put("action", "team_select");
+		responseData.put("type", "request");
+		System.out.println("Message to client: " + responseData.toString());
+		client.socket.send(responseData.toString());
+	}
+
+
+	/**
+	 * 
+	 * @param client Client that sends the message
+	 * @param data   Message data
+	 */
+	private void sendGlobalMessage(TicClient client, JSONObject data) {
+		TicClient room[] = conns.getClientsInRoom(client.roomCode);
+		System.out.println(room.length);
+		for (TicClient c : room) {
+			c.socket.send(data.getJSONObject("msg").toString());
+		}
 	}
 }

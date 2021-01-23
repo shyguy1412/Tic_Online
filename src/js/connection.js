@@ -69,7 +69,7 @@ function connectToServer() {
   connection.onopen = function () {
     //INIT CONNECTION
     var data = {
-      action: "innit",
+      action: "init",
       user_id: user_id,
       room_code: room_code
     };
@@ -85,27 +85,40 @@ function connectToServer() {
   connection.onmessage = function (e) {
     console.log('SERVER: ' + e.data);
     let data = JSON.parse(e.data);
-    switch (data.pos.area.split("_")[0]) {
-      case "playingArea":
-      console.log("PLAYING AREA");
-      playingArea.place(data);
-      break;
-      case "startArea":
-      console.log("START");
-      startAreas.forEach((area) => {
-        if(area.id == data.pos.area){
-          area.place(data);
+    switch (data.action) {
+      case "update_board":
+        updateBoard(data.data);
+        break;
+      case 'team_select':
+      if(data.type == "request"){
+        var interface = document.getElementById('interface_wrapper');
+        interface.innerHTML = `
+        <button type="button" name="team1" onclick="selectTeam(1)">Team 1</button>
+        <button type="button" name="team2" onclick="selectTeam(2)">Team 2</button>
+        `
+      } else if(data.type == "response"){
+        if(data.response == "true"){
+          //YAAAAY
+        } else {
+          //NAAAAY
         }
-      });
+      }
       break;
-      case "homeArea":
-      console.log("HOME");
-      homeAreas.forEach((area) => {
-        if(area.id == data.pos.area){
-          area.place(data);
-        }
-      });
-      break;
+
     }
   };
+}
+
+function selectTeam(team) {
+  var data = {
+    user_id: user_id,
+    room_code: room_code,
+    action: "team_select",
+    team_id: team-1
+  };
+  connection.sendJSON(data);
+
+  var interface = document.getElementById('interface_wrapper');
+  interface.innerHTML = "";
+
 }
