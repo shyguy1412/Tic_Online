@@ -14,7 +14,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
-var connection = new WebSocket('ws://localhost:4444');
+var connection;
 
 //TEST DATA//
 var m1 = {
@@ -44,64 +44,68 @@ var m4 = {
 
 // When the connection is open, send some data to the server
 
-connection.sendJSON = function(json){
-  var strData = JSON.stringify(json);
-  connection.send(strData);
-  console.log("CLIENT: " + strData);
-}
+function connectToServer() {
+  connection = new WebSocket('ws://localhost:4444');
 
-connection.sendChatMessage = function(msg){
-  var data = {
-    action: "msg_global",
-    msg: {
-      username: client_username,
-      user_id: user_id,
-      room_code: room_code,
-      text: msg
+  connection.sendJSON = function(json){
+    var strData = JSON.stringify(json);
+    connection.send(strData);
+    console.log("CLIENT: " + strData);
+  }
+
+  connection.sendChatMessage = function(msg){
+    var data = {
+      action: "msg_global",
+      msg: {
+        username: client_username,
+        user_id: user_id,
+        room_code: room_code,
+        text: msg
+      }
     }
+    connection.sendJSON(data);
   }
-  connection.sendJSON(data);
-}
 
-connection.onopen = function () {
-  //INIT CONNECTION
-  var data = {
-    action: "innit",
-    user_id: user_id,
-    room_code: room_code
+  connection.onopen = function () {
+    //INIT CONNECTION
+    var data = {
+      action: "innit",
+      user_id: user_id,
+      room_code: room_code
+    };
+    connection.sendJSON(data);
   };
-  connection.sendJSON(data);
-};
 
-// Log errors
-connection.onerror = function (error) {
-  console.log('WebSocket Error ' + error);
-};
+  // Log errors
+  connection.onerror = function (error) {
+    console.log('WebSocket Error ' + error);
+  };
 
-// Log messages from the server
-connection.onmessage = function (e) {
-  console.log('SERVER: ' + e.data);
-  let data = JSON.parse(e.data);
-  switch (data.pos.area.split("_")[0]) {
-    case "playingArea":
-    console.log("PLAYING AREA");
-    playingArea.place(data);
-    break;
-    case "startArea":
-    console.log("START");
-    startAreas.forEach((area) => {
-      if(area.id == data.pos.area){
-        area.place(data);
-      }
-    });
-    break;
-    case "homeArea":
-    console.log("HOME");
-    homeAreas.forEach((area) => {
-      if(area.id == data.pos.area){
-        area.place(data);
-      }
-    });
-    break;
-  }
-};
+  // Log messages from the server
+  connection.onmessage = function (e) {
+    console.log('SERVER: ' + e.data);
+    let data = JSON.parse(e.data);
+    switch (data.pos.area.split("_")[0]) {
+      case "playingArea":
+      console.log("PLAYING AREA");
+      playingArea.place(data);
+      break;
+      case "startArea":
+      console.log("START");
+      startAreas.forEach((area) => {
+        if(area.id == data.pos.area){
+          area.place(data);
+        }
+      });
+      break;
+      case "homeArea":
+      console.log("HOME");
+      homeAreas.forEach((area) => {
+        if(area.id == data.pos.area){
+          area.place(data);
+        }
+      });
+      break;
+    }
+  };
+}

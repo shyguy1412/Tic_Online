@@ -16,6 +16,10 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 session_start();
+
+if(!isset($_SESSION['user_id']) || !isset($_SESSION['username']) && isset($_GET['room_code'])){
+header('Location: http://localhost/testenv/Tic_Online/src/index.php/?room_code=' . $_GET['room_code']);
+}
 ?>
 
 <html>
@@ -36,7 +40,7 @@ session_start();
 <body>
   <h1>Tic Online</h1>
   <main>
-    <div  id="board_wrapper">
+    <div id="board_wrapper">
     </div>
   </main>
 </body>
@@ -45,13 +49,32 @@ var user_id = "<?php echo $_SESSION['user_id']; ?>";
 var room_code = "<?php echo $_SESSION['room_code']; ?>";
 var client_username =  "<?php echo $_SESSION['username']; ?>";
 
+if(client_username == ""|| user_id == ""){
+  var input_div = document.getElementById('input_div');
+  input_div.style = "";
+
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "index-ajax.php");
+  xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+  xhr.onload = function(){
+    var data = JSON.parse(this.responseText);
+    console.log(data);
+    if(data.success == "false"){
+      showError(data.msg, "username_error_field");
+      return;
+    }
+  }
+  xhr.send(`username=${username}&action=enter&data=${room_code}`);
+}
+
 var get_param_code = new URLSearchParams(location.search).get("room_code");
 if(get_param_code == null || get_param_code != room_code){
   window.history.replaceState(null, null, `?room_code=${room_code}`);
 }
-
 console.log("CLIENT ID: " + user_id);
 console.log("ROOM CODE: " + room_code);
 console.log("USERNAME: " + client_username);
+connectToServer();
 </script>
 </html>

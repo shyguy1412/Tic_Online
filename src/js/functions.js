@@ -2,22 +2,32 @@ function showError(msg, id){
   document.getElementById(id).innerHTML = msg;
 }
 
-function parseURLParams(url) {
-    var queryStart = url.indexOf("?") + 1,
-        queryEnd   = url.indexOf("#") + 1 || url.length + 1,
-        query = url.slice(queryStart, queryEnd - 1),
-        pairs = query.replace(/\+/g, " ").split("&"),
-        parms = {}, i, n, v, nv;
+function checkRoomcode(){
+  var username = document.getElementById('username_field').value
+  var nameRegex = /^[a-zA-Z0-9]+$/;
+  var nameValid = username.match(nameRegex);
 
-    if (query === url || query === "") return;
+  if(!username.replace(/\s/g, '').length){
+    showError("Roomcode cannot be empty!", "roomcode_error_field");
+  }else if(nameValid == null){
+    showError("Invalid Roomcode", "roomcode_error_field");
+    return false;
+  } else {
+    return true;
+  }
+}
 
-    for (i = 0; i < pairs.length; i++) {
-        nv = pairs[i].split("=", 2);
-        n = decodeURIComponent(nv[0]);
-        v = decodeURIComponent(nv[1]);
+function checkUsername(){
+  var username = document.getElementById('username_field').value
+  var nameRegex = /^[a-zA-Z0-9_]+$/;
+  var nameValid = username.match(nameRegex);
 
-        if (!parms.hasOwnProperty(n)) parms[n] = [];
-        parms[n].push(nv.length === 2 ? v : null);
-    }
-    return parms;
+  if(!username.replace(/\s/g, '').length){
+    showError("Username cannot be empty!", "username_error_field");
+  }else if(nameValid == null){
+    showError("Your name is not valid. Only letter, numbers and '_' are  acceptable.", "username_error_field");
+    return false;
+  } else {
+    return true;
+  }
 }

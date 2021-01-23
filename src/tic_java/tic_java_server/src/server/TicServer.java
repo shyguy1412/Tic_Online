@@ -27,6 +27,8 @@ import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 import org.json.JSONObject;
 
+import game.TicGame;
+
 /**
  * 
  * @author Nils Ramstöck
@@ -42,10 +44,12 @@ public class TicServer extends WebSocketServer {
 	private static int TCP_PORT = 4444;
 
 	private TicClientSet conns;
+	private Set<TicGame> games;
 
 	public TicServer() {
 		super(new InetSocketAddress(TCP_PORT));
 		conns = new TicClientSet();
+		games = new HashSet<TicGame>();
 	}
 
 	@Override
@@ -60,19 +64,32 @@ public class TicServer extends WebSocketServer {
 	public void onMessage(WebSocket conn, String message) {
 		JSONObject data = new JSONObject(message);
 		TicClient client = conns.getClientFromConnection(conn);
-		
+
 		System.out.println("Message from client: " + data);
 
-		
 		switch (data.getString("action")) {
 		case "innit":
 			client.userID = data.getString("user_id");
 			client.roomCode = data.getString("room_code");
+			boolean found = false;
+			for (TicGame g : games) {
+				if (g.getRoomCode().equals(client.roomCode)) {
+					if (!g.addPlayer(client)) {
+						//Tell player game is full
+					}
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				games.add(new TicGame(client.roomCode));
+			}
+
 			break;
 		case "msg_global":
 			TicClient room[] = conns.getClientsInRoom(client.roomCode);
 			System.out.println(room.length);
-			for(TicClient c : room) {
+			for (TicClient c : room) {
 				c.socket.send(data.getJSONObject("msg").toString());
 			}
 			break;

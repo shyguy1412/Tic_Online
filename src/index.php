@@ -14,6 +14,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+$room_code = isset($_GET['room_code'])?$_GET['room_code']:"";
 ?>
 
 <html lang="en">
@@ -24,7 +26,7 @@
   <meta name="description" content="Tic Online Multiplayer Board Game">
   <meta name="author" content="Nils Ramstöck">
 
-  <link rel="stylesheet" href="css/styles.css">
+  <link type="text/css" rel="stylesheet" href="http://localhost/testenv/Tic_Online/src/css/styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.2.0/p5.min.js"></script>
 </head>
 <body>
@@ -45,36 +47,11 @@
     </div>
   </div>
 </body>
-<script src="js/functions.js"></script>
+<script type="text/javascript" src="http://localhost/testenv/Tic_Online/src/js/functions.js"></script>
 <script>
-function checkRoomcode(){
-  var username = document.getElementById('username_field').value
-  var nameRegex = /^[a-zA-Z0-9]+$/;
-  var nameValid = username.match(nameRegex);
 
-  if(!username.replace(/\s/g, '').length){
-    showError("Roomcode cannot be empty!", "roomcode_error_field");
-  }else if(nameValid == null){
-    showError("Invalid Roomcode", "roomcode_error_field");
-    return false;
-  } else {
-    return true;
-  }
-}
-
-function checkUsername(){
-  var username = document.getElementById('username_field').value
-  var nameRegex = /^[a-zA-Z0-9_]+$/;
-  var nameValid = username.match(nameRegex);
-
-  if(!username.replace(/\s/g, '').length){
-    showError("Username cannot be empty!", "username_error_field");
-  }else if(nameValid == null){
-    showError("Your name is not valid. Only letter, numbers and '_' are  acceptable.", "username_error_field");
-    return false;
-  } else {
-    return true;
-  }
+if("<?php echo $room_code; ?>" != ""){
+  document.getElementById('room_code_field').value = "<?php echo $room_code; ?>";
 }
 
 function enterRoom(){
