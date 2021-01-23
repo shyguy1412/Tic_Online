@@ -83,6 +83,34 @@ public class TicGame {
 		sendBoardStateToClients();
 	}
 
+
+	public void handleMove(JSONObject moveData) {
+		if(moveData.getString("moveType").equals("normal")) {
+			//get marble
+			int pos = moveData.getJSONObject("marble").getInt("pos");
+			int amount = moveData.getInt("amount");
+			TicMarble marble = board.getPlayingArea().fields[pos].getOccupant();
+			board.moveMarbleBy(marble, amount, board.getPlayingArea());
+		} else if(moveData.getString("moveType").equals("special")) {
+			String action = moveData.getString("action");
+			switch(action) {
+			case "add_marble":
+				TicPlayer player = getPlayerByUserId(moveData.getString("user_id"));
+//				board.addNewMarbleToPlay(player);
+				int i = 0;
+				for(TicPlayer p : players) {
+					board.addNewMarbleToPlay(p);
+					board.moveMarbleToHome(board.getPlayingArea().fields[i++ * 15].getOccupant(), 0);
+					board.addNewMarbleToPlay(p);
+				}
+				break;
+			case "swap":
+				break;
+			}
+		}
+		this.sendBoardStateToClients();
+	}
+	
 	private void sendBoardStateToClients() {
 		JSONObject data = new JSONObject();
 		JSONArray marbles = new JSONArray();
@@ -92,11 +120,17 @@ public class TicGame {
 		for (TicPlayer p : players) {
 			for (TicMarble m : p.marbles) {
 				JSONObject marble = new JSONObject();
+				JSONObject color = new JSONObject();
 				JSONObject pos = new JSONObject();
 				pos.put("area", m.area);
 				pos.put("id", m.pos);
+				color.put("r", m.color.getRed());
+				color.put("g", m.color.getGreen());
+				color.put("b", m.color.getBlue());
+				marble.put("color", color);
 				marble.put("pos", pos);
-				marble.put("player_id", p.id);
+				marble.put("player_id", p.getId());
+				
 				marbles.put(marble);
 			}
 		}
@@ -134,6 +168,15 @@ public class TicGame {
 		return true;
 	}
 
+	public TicPlayer getPlayerByUserId(String userID) {
+		for(TicPlayer p : players) {
+			if(p.client.userID.equals(userID)){
+				return p;
+			}
+		}
+		return null;
+	}
+	
 	public String getRoomCode() {
 		return roomCode;
 	}
@@ -141,5 +184,6 @@ public class TicGame {
 	public TicPlayingBoard getBoard() {
 		return board;
 	}
+
 
 }

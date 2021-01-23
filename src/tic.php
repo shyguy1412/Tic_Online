@@ -31,11 +31,6 @@ header('Location: http://localhost/testenv/Tic_Online/src/index.php/?room_code='
   <meta name="author" content="Nils Ramstöck">
   <link type="text/css" rel="stylesheet" href="http://localhost/testenv/Tic_Online/src/css/styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.2.0/p5.min.js"></script>
-  <script type="text/javascript" src="http://localhost/testenv/Tic_Online/src/js/functions.js"></script>
-  <script type="text/javascript" src="http://localhost/testenv/Tic_Online/src/js/connection.js"></script>
-  <script type="text/javascript" src="http://localhost/testenv/Tic_Online/src/js/tic_board_classes.js"></script>
-  <script type="text/javascript" src="http://localhost/testenv/Tic_Online/src/js/tic_board_functions.js"></script>
-  <script type="text/javascript" src="http://localhost/testenv/Tic_Online/src/js/tic_board.js"></script>
 </head>
 <body>
   <h1>Tic Online</h1>
@@ -47,10 +42,10 @@ header('Location: http://localhost/testenv/Tic_Online/src/index.php/?room_code='
   </main>
 </body>
 <script>
+
 var user_id = "<?php echo $_SESSION['user_id']; ?>";
 var room_code = "<?php echo $_SESSION['room_code']; ?>";
 var client_username =  "<?php echo $_SESSION['username']; ?>";
-
 if(client_username == ""|| user_id == ""){
   var input_div = document.getElementById('input_div');
   input_div.style = "";
@@ -77,6 +72,10 @@ if(get_param_code == null || get_param_code != room_code){
 console.log("CLIENT ID: " + user_id);
 console.log("ROOM CODE: " + room_code);
 console.log("USERNAME: " + client_username);
-connectToServer();
 </script>
+<script type="text/javascript" src="http://localhost/testenv/Tic_Online/src/js/functions.js"></script>
+<script type="text/javascript" src="http://localhost/testenv/Tic_Online/src/js/connection.js"></script>
+<script type="text/javascript" src="http://localhost/testenv/Tic_Online/src/js/tic_board_classes.js"></script>
+<script type="text/javascript" src="http://localhost/testenv/Tic_Online/src/js/tic_board_functions.js"></script>
+<script type="text/javascript" src="http://localhost/testenv/Tic_Online/src/js/tic_board.js"></script>
 </html>

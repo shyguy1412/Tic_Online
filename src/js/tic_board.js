@@ -18,13 +18,6 @@ let playingArea;
 let homeAreas = [];
 let startAreas = [];
 
-let colorScheme = [
-  {r:255,g:0,  b:0},
-  {r:255,g:255,b:0},
-  {r:0,  g:255,b:0},
-  {r:0,  g:0,  b:255}
-];
-
 function setup() {
   let c_size = calc_canvas_size();
   createCanvas(c_size, c_size).parent("board_wrapper");
@@ -56,5 +49,5 @@ function draw() {
   startAreas.forEach((h) => {
     Field.render(h.fields)
   });
-
+  noLoop();
 }

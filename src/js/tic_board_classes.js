@@ -32,14 +32,21 @@ class Field {
     fill(150, 150, 150, 60);
   }
 
+  static clear(fields){
+    fields.forEach((field) => {
+      field.occupant = null;
+    });
+
+  }
+
   static render(fields){
     Field.setDrawOptions();
     fields.forEach((field) => {
       push();
       if(field.occupant != null){
-        let r = colorScheme[field.occupant.player_id].r;
-        let g = colorScheme[field.occupant.player_id].g;
-        let b = colorScheme[field.occupant.player_id].b;
+        let r = field.occupant.color.r;
+        let g = field.occupant.color.g;
+        let b = field.occupant.color.b;
         fill(r, g, b);
       }
       ellipse(field.pos.x, field.pos.y, Field.radius, Field.radius);

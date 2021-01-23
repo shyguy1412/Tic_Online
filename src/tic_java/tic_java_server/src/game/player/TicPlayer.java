@@ -8,7 +8,8 @@ import server.TicClient;
 
 public class TicPlayer {
 	
-	public int id;
+	private int id;
+	public int entryPoint;
 	public TicMarble[] marbles;
 	public TicTeam team;
 	public TicClient client;
@@ -16,10 +17,9 @@ public class TicPlayer {
 	
 	public TicPlayer(TicClient _client){
 		client = _client;
-//		game = client.game;
 		marbles = new TicMarble[4];
 		for(int i = 0; i < marbles.length; i++) {
-			marbles[i] = new TicMarble(i);
+			marbles[i] = new TicMarble(i, this);
 		}
 	}
 
@@ -27,13 +27,19 @@ public class TicPlayer {
 		//ADD PLAYER TO BOARD
 		TicPlayingBoard board = game.getBoard();
 		id = board.addPlayer(this);
-		
+		entryPoint = getId() * 15;
 		//PLACE MARBLES IN START AREA
-		TicArea startarea = board.getStartArea(id);
+		TicArea startarea = board.getStartArea(getId());
 		int i = 0;
 		for(TicField f : startarea.fields) {
-			f.place(marbles[i++]);
+			f.place(marbles[i]);
+			marbles[i].setColor();
+			i++;
 		}
+	}
+
+	public int getId() {
+		return id;
 	}
 
 }

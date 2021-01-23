@@ -17,10 +17,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 function createhomeAreas(arr) {
   let positions = [
-    {x:width*0.5, y:height*0.25},
     {x:width*0.75,y:height*0.5},
     {x:width*0.5, y:height*0.75},
     {x:width*0.25,y:height*0.5},
+    {x:width*0.5, y:height*0.25},
   ]
   for(let i = 0; i < 4; i++){
     let home = new Area("homeArea_" + i);
@@ -33,10 +33,10 @@ function createhomeAreas(arr) {
 
 function createstartAreas(arr){
   let positions = [
-    {x:width*0.125, y:height*0.125},
     {x:width*0.875,y:height*0.125},
     {x:width*0.875, y:height*0.875},
     {x:width*0.125,y:height*0.875},
+    {x:width*0.125, y:height*0.125},
   ]
   for(let i = 0; i < 4; i++){
     let start = new Area("startArea_" + i);
@@ -48,14 +48,13 @@ function createstartAreas(arr){
 }
 
 function updateBoard(data){
+  resetFields();
   for(marble of data){
     switch (marble.pos.area.split("_")[0]) {
       case "playingArea":
-      console.log("PLAYING AREA");
       playingArea.place(marble);
       break;
       case "startArea":
-      console.log("START");
       startAreas.forEach((area) => {
         if(area.id == marble.pos.area){
           area.place(marble);
@@ -63,7 +62,6 @@ function updateBoard(data){
       });
       break;
       case "homeArea":
-      console.log("HOME");
       homeAreas.forEach((area) => {
         if(area.id == marble.pos.area){
           area.place(marble);
@@ -72,6 +70,8 @@ function updateBoard(data){
       break;
     }
   }
+  console.log(startAreas[0]);
+  loop();
 }
 
 function createFieldsArc(x, y, r, amt, arr,  angle=360, angleOff=0){
@@ -82,6 +82,17 @@ function createFieldsArc(x, y, r, amt, arr,  angle=360, angleOff=0){
   }
 }
 
+function resetFields(){
+  ///CLEARING///
+  Field.clear(playingArea.fields);
+  homeAreas.forEach((h) => {
+    Field.clear(h.fields)
+  });
+  startAreas.forEach((h) => {
+    Field.clear(h.fields)
+  });
+
+}
 
 function calc_canvas_size(){
   return 600;
