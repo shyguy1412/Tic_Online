@@ -39,6 +39,32 @@ class Field {
 
   }
 
+  static getSelectedMarble(fields){
+    let x = mouseX;
+    let y = mouseY;
+    // console.log(fields);
+    for(let i = 0; i < fields.length; i++){
+      if(fields[i].occupant != null){
+        if(fields[i].occupant.selected){
+          return fields[i].occupant;
+        }
+      }
+    }
+    return null;
+  }
+
+  static checkCollision(fields){
+    let x = mouseX;
+    let y = mouseY;
+    fields.forEach((field) => {
+      if(field.occupant != null){
+        field.occupant.selected = dist(x, y, field.pos.x, field.pos.y) < this.radius;
+        if(field.occupant.selected){
+        }
+      }
+    });
+  }
+
   static render(fields){
     Field.setDrawOptions();
     fields.forEach((field) => {
@@ -48,6 +74,9 @@ class Field {
         let g = field.occupant.color.g;
         let b = field.occupant.color.b;
         fill(r, g, b);
+        if(field.occupant.selected != null && field.occupant.selected == true){
+          stroke(255);
+        }
       }
       ellipse(field.pos.x, field.pos.y, Field.radius, Field.radius);
       pop();
@@ -66,7 +95,7 @@ class Area{
       if(f.id == marble.pos.id){
         f.occupant = marble;
         console.log("MARBLE PLACED AT: " + this.id + ":"+ marble.pos.id)
-        console.log(f);
+        // console.log(f);
       }
     });
   }

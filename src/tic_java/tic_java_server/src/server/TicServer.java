@@ -36,10 +36,12 @@ import game.TicGame;
  */
 public class TicServer extends WebSocketServer {
 
+	static Set<Integer> stack = new HashSet<Integer>();
+
 	public static void main(String[] args) {
 		TicServer server = new TicServer();
 		server.start();
-		System.out.println(60%60);
+		System.out.println(-4 % 60);
 	}
 
 	private static int TCP_PORT = 4444;
@@ -74,8 +76,8 @@ public class TicServer extends WebSocketServer {
 			System.out.println();
 			break;
 		case "move":
-			for(TicGame g : games) {
-				if(data.getString("room_code").equals(g.getRoomCode())) {
+			for (TicGame g : games) {
+				if (data.getString("room_code").equals(g.getRoomCode())) {
 					JSONObject moveData = data.getJSONObject("moveData");
 					moveData.put("user_id", data.getString("user_id"));
 					g.handleMove(moveData);
@@ -84,6 +86,9 @@ public class TicServer extends WebSocketServer {
 			break;
 		case "msg_global":
 			this.sendGlobalMessage(client, data);
+			break;
+		case "validate_room_code":
+			this.validateRoomCode(client, data);
 			break;
 		case "team_select":
 			client.player.game.selectTeam(client, data.getInt("team_id"));
@@ -103,6 +108,7 @@ public class TicServer extends WebSocketServer {
 
 	@Override
 	public void onClose(WebSocket conn, int code, String reason, boolean remote) {
+		TicClient client = conns.getClientFromConnection(conn);
 		conns.remove(conn);
 		System.out.println("Closed connection to " + conn.getRemoteSocketAddress().getAddress().getHostAddress());
 	}
@@ -124,8 +130,18 @@ public class TicServer extends WebSocketServer {
 		boolean found = false;
 		for (TicGame g : games) {
 			if (g.getRoomCode().equals(client.roomCode)) {
-				if (!g.addPlayer(client)) {
-					System.out.println("GAME IS FULL: " + client.roomCode);
+				if (g.addPlayer(client)) {
+					JSONObject responseData = new JSONObject();
+					responseData.put("action", "team_select");
+					responseData.put("type", "request");
+					System.out.println("Message to client: " + responseData.toString());
+					client.socket.send(responseData.toString());
+				} else {
+					if (g.reconnectPlayer(client)) {
+						client.socket.send(g.getBoardState().toString());
+					} else {
+						System.out.println("GAME IS FULL: " + client.roomCode);
+					}
 				}
 				found = true;
 				break;
@@ -134,29 +150,37 @@ public class TicServer extends WebSocketServer {
 		if (!found) {
 			TicGame game = new TicGame(client.roomCode);
 			games.add(game);
-			addDummyPlayers(game, client); //FOR TESTING
+			addDummyPlayers(game, client); // FOR TESTING
 			if (!game.addPlayer(client)) {
-				System.out.println("GAME IS FULL: " + client.roomCode);
+				System.out.println("ERROR CREATING GAME: " + client.roomCode);
 			}
-			game.selectTeam(client, 1); //FOR TESTING
-			return; //FOR TESTING
+			game.selectTeam(client, 1); // FOR TESTING
+			return; // FOR TESTING
 		}
+
+	}
+
+	private void validateRoomCode(TicClient client, JSONObject data) {
 		JSONObject responseData = new JSONObject();
-		responseData.put("action", "team_select");
-		responseData.put("type", "request");
-		System.out.println("Message to client: " + responseData.toString());
+		responseData.put("action", "validate_room_code");
+		responseData.put("valid", "false");
+		for (TicGame g : games) {
+			if (g.getRoomCode().equals(data.getString("room_code"))) {
+				responseData.put("valid", "false");
+				break;
+			}
+		}
 		client.socket.send(responseData.toString());
 	}
 
-
 	private void addDummyPlayers(TicGame game, TicClient client) {
-		for(int i = 0; i < 3; i++) {
+		for (int i = 0; i < 3; i++) {
 			TicClient dummy = new TicClient();
 			dummy.roomCode = game.getRoomCode();
 			dummy.userID = Integer.toString(i);
 			dummy.socket = client.socket;
 			game.addPlayer(dummy);
-			game.selectTeam(dummy, i%2);
+			game.selectTeam(dummy, i % 2);
 		}
 	}
 

@@ -35,11 +35,15 @@ function setup() {
 function draw() {
   background(255, 134, 89);
   /// HELPER LINES
-  stroke(0);
-  strokeWeight(1);
-  line(width*0.5, 0, width*0.5, height);
-  line(0, height*0.5, width, height*0.5);
+  // stroke(0);
+  // strokeWeight(1);
+  // line(width*0.5, 0, width*0.5, height);
+  // line(0, height*0.5, width, height*0.5);
   ///////////////////////////////////////
+
+  stroke(1);
+  fill(100, 80);
+  ellipse(width/2, height/2, width/4, height/4);
 
   ///RENDERING///
   Field.render(playingArea.fields);
@@ -50,4 +54,17 @@ function draw() {
     Field.render(h.fields)
   });
   noLoop();
+}
+
+function mouseReleased(){
+  if(mouseX < width && mouseX > 0 && mouseY < height && mouseY > 0){
+    Field.checkCollision(playingArea.fields);
+    homeAreas.forEach((h) => {
+      Field.checkCollision(h.fields)
+    });
+    startAreas.forEach((h) => {
+      Field.checkCollision(h.fields)
+    });
+    loop();
+  }
 }

@@ -25,6 +25,7 @@ $databaseInfo = array(
 );
 
 if(isset($_POST['username']) && isset($_POST['action'])){
+
   $mysqli = new mysqli($databaseInfo['ip'], $databaseInfo['dbusr'], $databaseInfo['pass'], $databaseInfo['table']);
   if ($mysqli->connect_errno) {
     die("Verbindung fehlgeschlagen: " . $mysqli->connect_error);
@@ -36,7 +37,6 @@ if(isset($_POST['username']) && isset($_POST['action'])){
   $action = $_POST['action'];
   switch ($action) {
     case 'create':
-
     //gerenate a room code
     $alphabet = "abcdefghijklmnopqrstuvwxyz1234567890";
     $room_code = substr(str_shuffle($alphabet), 0, 10);
@@ -101,6 +101,7 @@ if(isset($_POST['username']) && isset($_POST['action'])){
     $_SESSION['user_id'] = $user_id;
 
     echo json_encode($return_data);
+    exit();
     break;
   }
 }

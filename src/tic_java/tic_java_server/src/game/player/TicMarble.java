@@ -27,7 +27,7 @@ public class TicMarble {
 	public boolean moveToStart() {
 		TicField[] start = owner.game.getBoard().getStartArea(owner.getId()).fields;
 		for (TicField f : start) {
-			if (f.getOccupant() == null) {
+			if (!f.hasOccupant()) {
 				f.place(this);
 				return true;
 			}

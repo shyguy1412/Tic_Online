@@ -17,8 +17,12 @@
 
 session_start();
 
-if(!isset($_SESSION['user_id']) || !isset($_SESSION['username']) && isset($_GET['room_code'])){
-header('Location: http://localhost/testenv/Tic_Online/src/index.php/?room_code=' . $_GET['room_code']);
+if((!isset($_SESSION['user_id']) || !isset($_SESSION['username'])) && isset($_GET['room_code'])){
+  header('Location: http://localhost/testenv/Tic_Online/src/index.php/?room_code=' . $_GET['room_code']);
+  die();
+} else if (!isset($_GET['room_code'])){
+  header('Location: http://localhost/testenv/Tic_Online/src/index.php');
+  die();
 }
 ?>
 
@@ -37,7 +41,18 @@ header('Location: http://localhost/testenv/Tic_Online/src/index.php/?room_code='
   <main>
     <div id="board_wrapper">
     </div>
-    <div id="interface_wrapper">
+    <div style="margin-top:10px;" id="interface_wrapper">
+      <button type="button" onclick="enterMarble()" name="enter">Enter</button>
+      <button type="button" onclick="moveBy(document.getElementById('num_in').value)" name="move">Move</button><input id="num_in" type="number" name="num" value="5">
+      <br><br>
+      <button type="button" onclick="swapMarbles()" name="swap">Swap</button>
+      <button type="button" onclick="" name="enter">Skip</button>
+      <button type="button" onclick="" name="enter">Split</button>
+      <button type="button" onclick="" name="enter">Undo</button>
+      <button type="button" onclick="" name="enter">Mind Control</button>
+      <button type="button" onclick="" name="enter">First Aid</button>
+      <button type="button" onclick="" name="enter">Dash Attack</button>
+      <button type="button" onclick="" name="enter">Hand Around</button>
     </div>
   </main>
 </body>

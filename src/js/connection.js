@@ -17,34 +17,38 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 var connection;
 
 //TEST DATA//
-var m1 = {
-  color: {r:255, g:0, b:0},
-  pos  : {area:"playingArea", id: 30}
-};
-
-var m2 = {
-  color: {r:0, g:255, b:0},
-  pos  : {area:"homeArea_1", id: 2}
-};
-
-var m3 = {
-  color: {r:0, g:0, b:255},
-  pos  : {area:"startArea_3", id: 3}
-};
-
-var m4 = {
-  color: {r:255, g:255, b:0},
-  pos  : {area:"homeArea_2", id: 2}
-};
-
-var testMove = {
+var numberMove = {
   action: "move",
   room_code: room_code,
   user_id: user_id,
   moveData: {
-    moveType: "normal",
-    amount: "5",
-    marble: {area: "playingArea", pos: 20},
+    card: "number",
+    value: 5,
+    marble: {area: "playingArea", pos: 45}
+  }
+}
+
+var stepMove = {
+  action: "move",
+  room_code: room_code,
+  user_id: user_id,
+  moveData: {
+    card: "split",
+    marbles: [
+      {amount: "3", marble: {area: "playingArea", pos: 20}},
+      {amount: "2", marble: {area: "playingArea", pos: 4}},
+      {amount: "2", marble: {area: "homeArea_1", pos: 0}},
+      {amount: "-1", marble: {area: "homeArea_1", pos: 0}}
+    ]
+  }
+}
+
+var skipMove = {
+  action: "move",
+  room_code: room_code,
+  user_id: user_id,
+  moveData: {
+    card: "skip"
   }
 }
 
@@ -53,31 +57,53 @@ var addMove = {
   room_code: room_code,
   user_id: user_id,
   moveData: {
-    moveType: "special",
-    action: "add_marble"
+    card: "starter"
   }
 }
 
-var testSpecialMove = {
+var swapMove = {
   action: "move",
   room_code: room_code,
   user_id: user_id,
   moveData: {
-    moveType: "special",
-    action: "swap",
+    card: "swap",
     marbles: [
-      {area: "playingArea", pos: 20},
-      {area: "playingArea", pos: 55}
+      {area: "playingArea", pos: 45},
+      {area: "playingArea", pos: 0}
     ]
   }
 }
 
-// connection.send(JSON.stringify(m1)); // Send the message 'Ping' to the server
-// connection.send(JSON.stringify(m2)); // Send the message 'Ping' to the server
-// connection.send(JSON.stringify(m3)); // Send the message 'Ping' to the server
-// connection.send(JSON.stringify(m4)); // Send the message 'Ping' to the server
+function enterMarble(){
+  var move = {
+    action: "move",
+    room_code: room_code,
+    user_id: user_id,
+    moveData: {
+      card: "starter"
+    }
+  }
+  connection.sendJSON(move);
+}
 
-// When the connection is open, send some data to the server
+function moveBy(value){
+  var marble = getSelectedMarble();
+  if(marble == null){
+    console.log("NO MARBLE SELECTED");
+    return;
+  }
+  var move = {
+    action: "move",
+    room_code: room_code,
+    user_id: user_id,
+    moveData: {
+      card: "number",
+      value: value,
+      marble: {area: marble.pos.area, pos: marble.pos.id}
+    }
+  }
+  connection.sendJSON(move);
+}
 
 connection = new WebSocket('ws://localhost:4444');
 
@@ -117,7 +143,7 @@ connection.onerror = function (error) {
 
 // Log messages from the server
 connection.onmessage = function (e) {
-  console.log('SERVER: ' + e.data);
+  console.log('SERVER:');
   let data = JSON.parse(e.data);
   console.log(data);
   switch (data.action) {

@@ -42,4 +42,9 @@ public class TicPlayer {
 		return id;
 	}
 
+	public TicField getField(TicMarble marble) {
+		TicArea area = game.getBoard().getArea(marble.area);
+		return area.fields[marble.pos];
+	}
+
 }

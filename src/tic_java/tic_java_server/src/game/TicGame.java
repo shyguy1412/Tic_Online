@@ -3,6 +3,7 @@ package game;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import game.board.TicArea;
 import game.board.TicPlayingBoard;
 import game.player.TicMarble;
 import game.player.TicPlayer;
@@ -47,9 +48,28 @@ public class TicGame {
 				return true;
 			}
 		}
+
 		return false;
 	}
-
+	
+	public boolean reconnectPlayer(TicClient client) {
+		for(TicPlayer p : players) {
+			System.out.println(p.client.userID + ":" + client.userID);
+			//TESTING//
+			p.client = client;
+			if(true)continue;
+			//////////
+			if(p.client.userID.equals(client.userID)) {
+				p.client = client;
+				client.socket.send("ALL GOOD!");
+				System.out.println("Player reconnected successfully");
+				return true;
+			}
+		}
+		if(true)return true; //TESTING
+		return false;
+	}
+	
 	/**
 	 * assigns player to the selected team
 	 * 
@@ -83,35 +103,86 @@ public class TicGame {
 		sendBoardStateToClients();
 	}
 
-
 	public void handleMove(JSONObject moveData) {
-		if(moveData.getString("moveType").equals("normal")) {
-			//get marble
-			int pos = moveData.getJSONObject("marble").getInt("pos");
-			int amount = moveData.getInt("amount");
-			TicMarble marble = board.getPlayingArea().fields[pos].getOccupant();
-			board.moveMarbleBy(marble, amount, board.getPlayingArea());
-		} else if(moveData.getString("moveType").equals("special")) {
-			String action = moveData.getString("action");
-			switch(action) {
-			case "add_marble":
-				TicPlayer player = getPlayerByUserId(moveData.getString("user_id"));
-//				board.addNewMarbleToPlay(player);
-				int i = 0;
-				for(TicPlayer p : players) {
-					board.addNewMarbleToPlay(p);
-					board.moveMarbleToHome(board.getPlayingArea().fields[i++ * 15].getOccupant(), 0);
-					board.addNewMarbleToPlay(p);
-				}
-				break;
-			case "swap":
-				break;
-			}
+		String card = moveData.getString("card");
+		switch (card) {
+		case "number":
+			this.handleNumberMove(moveData);
+			break;
+		case "swap":
+			this.handleSwapMove(moveData);
+			break;
+		case "starter":
+			this.handleStarterMove(moveData);
+			break;
+		case "skip":
+			this.handleSkipMove(moveData);
+			break;
+		case "backwards":
+			this.handleBackwardsMove(moveData);
+			break;
+		case "split":
+			this.handleSplitMove(moveData);
+			break;
 		}
 		this.sendBoardStateToClients();
 	}
-	
+
+	private void handleNumberMove(JSONObject moveData) {
+		TicMarble marble = this.getMarbleFromJSON(moveData.getJSONObject("marble"));
+		int amount = moveData.getInt("value");
+		if(amount == 4)amount = -amount; //always backwards
+		board.moveMarbleBy(marble, amount);
+	}
+
+	private void handleSwapMove(JSONObject moveData) {
+		TicMarble marble1 = this.getMarbleFromJSON(moveData.getJSONArray("marbles").getJSONObject(0));
+		TicMarble marble2 = this.getMarbleFromJSON(moveData.getJSONArray("marbles").getJSONObject(1));
+		board.swapMarbles(marble1, marble2);
+	}
+
+	private void handleStarterMove(JSONObject moveData) {
+		TicPlayer player = this.getPlayerByUserId(moveData.getString("user_id"));
+		board.addNewMarbleToPlay(player);
+//		TESTING
+//		int i = 0;
+//		for (TicPlayer p : players) {
+//			board.addNewMarbleToPlay(p);
+//			board.moveMarbleToHome(board.getPlayingArea().fields[i++ * 15].getOccupant(), 0);
+//			board.addNewMarbleToPlay(p);
+//		}
+	}
+
+	private void handleSkipMove(JSONObject moveData) {
+		//NEED TURN SYSTEM FIRST
+	}
+
+	private void handleSplitMove(JSONObject moveData) {
+		
+	}
+
+	private void handleBackwardsMove(JSONObject moveData) {
+		TicMarble marble = this.getMarbleFromJSON(moveData.getJSONObject("marble"));
+		int amount = moveData.getInt("value");
+		board.moveMarbleBy(marble, -4);
+	}
+
+	private TicMarble getMarbleFromJSON(JSONObject jsonMarble) {
+		int pos = jsonMarble.getInt("pos");
+		String strArea = jsonMarble.getString("area");
+		TicArea area = board.getArea(strArea);
+		return area.fields[pos].getOccupant();
+	}
+
 	private void sendBoardStateToClients() {
+		JSONObject data = this.getBoardState();
+		System.out.print("Message to room '" + roomCode + "': " + data);
+		for (TicPlayer p : players) {
+			p.client.socket.send(data.toString());
+		}
+	}
+	
+	public JSONObject getBoardState() {
 		JSONObject data = new JSONObject();
 		JSONArray marbles = new JSONArray();
 
@@ -130,15 +201,12 @@ public class TicGame {
 				marble.put("color", color);
 				marble.put("pos", pos);
 				marble.put("player_id", p.getId());
-				
+
 				marbles.put(marble);
 			}
 		}
 		data.put("data", marbles);
-		System.out.print("Message to room '" + roomCode + "': " + data);		
-		for (TicPlayer p : players) {
-			p.client.socket.send(data.toString());
-		}
+		return data;
 	}
 
 	public void printDebug() {
@@ -169,14 +237,14 @@ public class TicGame {
 	}
 
 	public TicPlayer getPlayerByUserId(String userID) {
-		for(TicPlayer p : players) {
-			if(p.client.userID.equals(userID)){
+		for (TicPlayer p : players) {
+			if (p.client.userID.equals(userID)) {
 				return p;
 			}
 		}
 		return null;
 	}
-	
+
 	public String getRoomCode() {
 		return roomCode;
 	}
@@ -184,6 +252,5 @@ public class TicGame {
 	public TicPlayingBoard getBoard() {
 		return board;
 	}
-
 
 }

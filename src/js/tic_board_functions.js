@@ -26,7 +26,7 @@ function createhomeAreas(arr) {
     let home = new Area("homeArea_" + i);
     let x = positions[i].x;
     let y = positions[i].y;
-    createFieldsArc(x, y, 50, 4, home.fields, 240, 90*i);
+    createFieldsArc(x, y, 50, 4, home.fields, 240, 90*(i+1));
     arr.push(home);
   }
 }
@@ -45,6 +45,25 @@ function createstartAreas(arr){
     createFieldsArc(x, y, 35, 4, start.fields, 360);
     arr.push(start);
   }
+}
+
+function getSelectedMarble(){
+  let marble = null;
+  marble = Field.getSelectedMarble(playingArea.fields);
+  if(marble != null)return marble;
+
+  homeAreas.forEach((h) => {
+    var m = Field.getSelectedMarble(h.fields);
+    if(m!=null)marble=m;
+  });
+  if(marble != null)return marble;
+
+  startAreas.forEach((h) => {
+    var m = Field.getSelectedMarble(h.fields);
+    if(m!=null)marble=m;
+  });
+  if(marble != null)return marble;
+
 }
 
 function updateBoard(data){
