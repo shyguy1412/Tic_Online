@@ -41,7 +41,6 @@ public class TicServer extends WebSocketServer {
 	public static void main(String[] args) {
 		TicServer server = new TicServer();
 		server.start();
-		System.out.println(-4 % 60);
 	}
 
 	private static int TCP_PORT = 4444;

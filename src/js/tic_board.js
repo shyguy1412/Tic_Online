@@ -18,9 +18,13 @@ let playingArea;
 let homeAreas = [];
 let startAreas = [];
 
+let state = {
+  busy: false,
+  card: null
+};
+
 function setup() {
-  let c_size = calc_canvas_size();
-  createCanvas(c_size, c_size).parent("board_wrapper");
+  createCanvas(0, 0).parent("board_wrapper");
   //PLAYING FIELD//
   playingArea = new Area("playingField");
   createFieldsArc(width*0.5, height*0.5, width*0.5 - 60, 60, playingArea.fields);
@@ -30,6 +34,10 @@ function setup() {
 
   //START AREAS
   createstartAreas(startAreas);
+
+  updateCanvasSize();
+  updateCanvasSize();
+  connectToServer();
 }
 
 function draw() {
@@ -56,14 +64,28 @@ function draw() {
   noLoop();
 }
 
-function mouseReleased(){
+
+function mouseMoved(){
   if(mouseX < width && mouseX > 0 && mouseY < height && mouseY > 0){
-    Field.checkCollision(playingArea.fields);
+    Field.checkCollision(playingArea.fields, Field.hoverEvent);
     homeAreas.forEach((h) => {
-      Field.checkCollision(h.fields)
+      Field.checkCollision(h.fields, Field.hoverEvent)
     });
     startAreas.forEach((h) => {
-      Field.checkCollision(h.fields)
+      Field.checkCollision(h.fields, Field.hoverEvent)
+    });
+    loop();
+  }
+}
+
+function mouseReleased(){
+  if(mouseX < width && mouseX > 0 && mouseY < height && mouseY > 0){
+    Field.checkCollision(playingArea.fields, Field.clickEvent);
+    homeAreas.forEach((h) => {
+      Field.checkCollision(h.fields, Field.clickEvent)
+    });
+    startAreas.forEach((h) => {
+      Field.checkCollision(h.fields, Field.clickEvent)
     });
     loop();
   }

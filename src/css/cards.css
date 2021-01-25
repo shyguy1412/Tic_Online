@@ -1,0 +1,93 @@
+/* Tic Online is an online multiplayer board game.
+Copyright (C) 2021  Nils Ramstöck
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>. */
+
+.card {
+  margin-left: auto;
+  margin-right: auto;
+  padding: 15px;
+  background-color: white;
+  width: 120px;
+  height: 120px;
+  border-radius: 10%;
+  font-family: 'Rajdhani', sans-serif;
+  user-select: none;
+}
+
+
+/*SPLIT CARD*/
+.split_dot {
+  background-color: lightgray;
+  border-radius: 50%;
+  width: 2em;
+  height: 2em;
+  text-align: center;
+  border-style: solid;
+  border-width: 2px;
+}
+
+/* .split .split_dot {
+display: block;
+background-color:white;
+} */
+
+.split{
+  display: flex;
+  justify-content: space-between;
+}
+
+.split .column{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/*NUMBER CARD*/
+
+.number{
+  display: table;
+  text-align: center;
+}
+
+.number .value{
+  display: table-cell;
+  vertical-align: middle;
+  font-size: 6vh;
+}
+
+/*SWAP CARD*/
+.swap{
+  display: table;
+  text-align: center;
+}
+
+.swap .value{
+  display: table-cell;
+  vertical-align: middle;
+  font-size: 3vh;
+}
+
+/*BACKWARDS CARD*/
+.backwards{
+  text-align: center;
+  display: table;
+  color: red;
+}
+
+.backwards .value{
+  display: table-cell;
+  vertical-align: middle;
+  font-size: 6vh;
+}

@@ -19,36 +19,29 @@ body{
 }
 
 .height-third {
-	min-height: 33vh;
+  min-height: 33vh;
 }
 
 .game-btn {
-	text-align: center; 
-	font-size: 13pt; 
-	margin-bottom: 3vh;
-	font-family: 'Yusei Magic', sans-serif;
+  text-align: center;
+  font-size: 13pt;
+  margin-bottom: 3vh;
+  font-family: 'Rajdhani', sans-serif;
 }
 
-input {
-    padding: 20px 20px;
+/* input {
+padding: 20px 20px;
 }
 
 input,
 input::-webkit-input-placeholder {
-    font-size: 13pt;
-    line-height: 3;
-    font-family: 'Yusei Magic', sans-serif;
-}
+font-size: 13pt;
+line-height: 1;
+font-family: 'Yusei Magic', sans-serif;
+} */
 
 h1{
   text-align: center;
-  font-family: 'Yusei Magic', sans-serif;
-}
-
-#board_wrapper canvas {
-    padding-left: 0;
-    padding-right: 0;
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
+  font-size: 5vh;
+  font-family: 'Rajdhani', sans-serif;
 }

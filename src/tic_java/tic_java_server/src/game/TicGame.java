@@ -131,7 +131,7 @@ public class TicGame {
 	private void handleNumberMove(JSONObject moveData) {
 		TicMarble marble = this.getMarbleFromJSON(moveData.getJSONObject("marble"));
 		int amount = moveData.getInt("value");
-		if(amount == 4)amount = -amount; //always backwards
+//		if(amount == 4)amount = -amount; //always backwards
 		board.moveMarbleBy(marble, amount);
 	}
 
@@ -163,7 +163,6 @@ public class TicGame {
 
 	private void handleBackwardsMove(JSONObject moveData) {
 		TicMarble marble = this.getMarbleFromJSON(moveData.getJSONObject("marble"));
-		int amount = moveData.getInt("value");
 		board.moveMarbleBy(marble, -4);
 	}
 

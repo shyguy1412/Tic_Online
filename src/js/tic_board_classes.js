@@ -14,12 +14,18 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
-class Field {
+class Field{
   static radius = 20;
+
+  static clickEvent = new Event('click');
+  static hoverEvent = new Event('hover');
+  static eventTarget = new EventTarget();
 
   constructor(x, y, id) {
     this.id = id;
     this.occupant = null;
+    this.selected = false;
+    this.hovered = false;
     this.pos = {
       x: x,
       y: y
@@ -53,14 +59,19 @@ class Field {
     return null;
   }
 
-  static checkCollision(fields){
+
+  static checkCollision(fields, event){
     let x = mouseX;
     let y = mouseY;
     fields.forEach((field) => {
-      if(field.occupant != null){
-        field.occupant.selected = dist(x, y, field.pos.x, field.pos.y) < this.radius;
-        if(field.occupant.selected){
+      if(field.occupant != null && dist(x, y, field.pos.x, field.pos.y) < this.radius/2){
+        field.hovered = true;
+        event.data = {
+          marble: field.occupant
         }
+        Field.eventTarget.dispatchEvent(event);
+      }else{
+        field.hovered = false;
       }
     });
   }
@@ -74,11 +85,12 @@ class Field {
         let g = field.occupant.color.g;
         let b = field.occupant.color.b;
         fill(r, g, b);
-        if(field.occupant.selected != null && field.occupant.selected == true){
+        if(field.occupant.selected == true){
           stroke(255);
         }
       }
-      ellipse(field.pos.x, field.pos.y, Field.radius, Field.radius);
+      let zoom = field.hovered?width*0.005:0;
+      ellipse(field.pos.x, field.pos.y, Field.radius + zoom, Field.radius + zoom);
       pop();
     });
   }
@@ -94,7 +106,7 @@ class Area{
     this.fields.forEach((f) => {
       if(f.id == marble.pos.id){
         f.occupant = marble;
-        console.log("MARBLE PLACED AT: " + this.id + ":"+ marble.pos.id)
+        // console.log("MARBLE PLACED AT: " + this.id + ":"+ marble.pos.id)
         // console.log(f);
       }
     });

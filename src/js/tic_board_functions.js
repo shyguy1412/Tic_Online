@@ -26,23 +26,23 @@ function createhomeAreas(arr) {
     let home = new Area("homeArea_" + i);
     let x = positions[i].x;
     let y = positions[i].y;
-    createFieldsArc(x, y, 50, 4, home.fields, 240, 90*(i+1));
+    createFieldsArc(x, y, width*0.075, 4, home.fields, 240, 90*(i+1));
     arr.push(home);
   }
 }
 
 function createstartAreas(arr){
   let positions = [
-    {x:width*0.875,y:height*0.125},
-    {x:width*0.875, y:height*0.875},
-    {x:width*0.125,y:height*0.875},
-    {x:width*0.125, y:height*0.125},
+    {x:width*0.9,y:height*0.1},
+    {x:width*0.9, y:height*0.9},
+    {x:width*0.1,y:height*0.9},
+    {x:width*0.1, y:height*0.1},
   ]
   for(let i = 0; i < 4; i++){
     let start = new Area("startArea_" + i);
     let x = positions[i].x;
     let y = positions[i].y;
-    createFieldsArc(x, y, 35, 4, start.fields, 360);
+    createFieldsArc(x, y, width*0.05, 4, start.fields, 360, 45);
     arr.push(start);
   }
 }
@@ -114,11 +114,43 @@ function resetFields(){
 }
 
 function calc_canvas_size(){
-  return 600;
+  return $("#board_col").width();
 }
+
+// Field.eventTarget.addEventListener("hover", function(e) {
+//   e.data.marble.hovered = true;
+// })
 
 window.addEventListener('resize', updateCanvasSize);
 function updateCanvasSize(){
   let c_size = calc_canvas_size();
+  Field.radius = width * 0.038;
+
+  let newArea = new Area(playingArea.id);
+  createFieldsArc(width*0.5, height*0.5, width*0.415, 60, newArea.fields);
+
+  newArea.fields.forEach((f, i) => {
+    playingArea.fields[i].pos = f.pos;
+  });
+
+
+  let newAreas = [];
+  //HOME AREAS
+  createhomeAreas(newAreas);
+  homeAreas.forEach((area, i) => {
+    newAreas[i].fields.forEach((f, j) => {
+      area.fields[j].pos = f.pos;
+    });
+  });
+
+  newAreas = [];
+  createstartAreas(newAreas);
+  startAreas.forEach((area, i) => {
+    newAreas[i].fields.forEach((f, j) => {
+      area.fields[j].pos = f.pos;
+    });
+  });
+
   resizeCanvas(c_size, c_size);
+  loop();
 }

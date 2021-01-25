@@ -42,7 +42,7 @@ $room_code = isset($_GET['room_code']) ? $_GET['room_code'] : "";
 
   <!-- Custom Fonts -->
   <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=Yusei+Magic&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani&display=swap" rel="stylesheet">
 
   <!-- Site Specific CSS -->
   <link type="text/css" rel="stylesheet" href="http://localhost/testenv/Tic_Online/src/css/styles.css">
