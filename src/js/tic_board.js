@@ -36,8 +36,7 @@ function setup() {
   createstartAreas(startAreas);
 
   updateCanvasSize();
-  updateCanvasSize();
-  connectToServer();
+  connection = connectToServer(connection);
 }
 
 function draw() {

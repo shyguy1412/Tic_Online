@@ -37,8 +37,13 @@ if((!isset($_SESSION['user_id']) || !isset($_SESSION['username'])) && isset($_GE
 
   <!-- JQuery -->
   <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+
+
 
   <!-- Bootstrap -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
 
@@ -64,7 +69,7 @@ if((!isset($_SESSION['user_id']) || !isset($_SESSION['username'])) && isset($_GE
         </div>
       </div>
 
-      <div class="row">
+      <!-- <div class="row">
         <div id="debug_options">
           <button type="button" onclick="enterMarble()" name="enter">Enter</button>
           <button type="button" onclick="moveMarbleBy(document.getElementById('num_in').value)" name="move">Move</button><input id="num_in" type="number" name="num" value="5">
@@ -78,7 +83,16 @@ if((!isset($_SESSION['user_id']) || !isset($_SESSION['username'])) && isset($_GE
           <button type="button" onclick="" name="enter">Dash Attack</button>
           <button type="button" onclick="" name="enter">Hand Around</button>
         </div>
-      </div>
+      </div> -->
+<!--
+      <div class="row">
+        <div class="play_choice">
+          <button type="button" onclick="connection = conn_a;" name="enter">A</button>
+          <button type="button" onclick="connection = conn_b" name="enter">B</button>
+          <button type="button" onclick="connection = conn_c" name="enter">C</button>
+          <button type="button" onclick="connection = conn_d" name="enter">D</button>
+        </div>
+      </div> -->
 
       <div class="row">
         <div class="col-sm-3"></div>
@@ -95,17 +109,22 @@ if((!isset($_SESSION['user_id']) || !isset($_SESSION['username'])) && isset($_GE
           <div id="interface_wrapper">
             <div class="hand row">
               <div class="col-sm-1"></div>
-              <div class="col-sm-2" id="card_1"></div>
-              <div class="col-sm-2" id="card_2"></div>
-              <div class="col-sm-2" id="card_3"></div>
-              <div class="col-sm-2" id="card_4"></div>
-              <div class="col-sm-2" id="card_5"></div>
+              <div class="col-sm-10">
+                <div id="teamButtons">
+
+                </div>
+                <div class="d-flex justify-content-around" id="hand_cards">
+                </div>
+              </div>
               <div class="col-sm-1"></div>
             </div>
           </div>
         </div>
         <div class="col-sm-1"></div>
       </div>
+
+      <div class="row" style="margin-top:5vh"></div>
+
     </div>
   </div>
 </main>

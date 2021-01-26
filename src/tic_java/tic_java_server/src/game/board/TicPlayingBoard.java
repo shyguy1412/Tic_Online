@@ -1,5 +1,8 @@
 package game.board;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import game.player.TicMarble;
 import game.player.TicPlayer;
 
@@ -8,11 +11,13 @@ public class TicPlayingBoard {
 	private TicArea playingArea;
 	private TicArea[] homeAreas;
 	private TicArea[] startAreas;
-
+;
+	
 	public TicPlayingBoard() {
 		playingArea = new TicArea(TicArea.PLAYING__AREA, 60);
 		homeAreas = new TicArea[4];
 		startAreas = new TicArea[4];
+				
 	}
 
 	public int addPlayer(TicPlayer player) {
@@ -49,10 +54,10 @@ public class TicPlayingBoard {
 		}
 		int pos1 = marble1.pos;
 		int pos2 = marble2.pos;
-		System.out.println(pos1 + ":" + pos2);
+//		System.out.println(pos1 + ":" + pos2);
 //		playingArea.fields[pos1].clear();
 //		playingArea.fields[pos2].clear();
-		System.out.println(marble1 + ":" + marble2);
+//		System.out.println(marble1 + ":" + marble2);
 		playingArea.fields[pos1].place(marble2);
 		playingArea.fields[pos2].place(marble1);
 		return true;
@@ -63,7 +68,7 @@ public class TicPlayingBoard {
 			start += offset;
 			offset *= -1;
 		}
-		System.out.println("Check for marbles: " + start + ":" + offset);
+//		System.out.println("Check for marbles: " + start + ":" + offset);
 		for (int i = start + 1; i < start + offset; i++) {
 			int index = i % 60;
 			while (index < 0) {

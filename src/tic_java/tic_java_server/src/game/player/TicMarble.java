@@ -13,8 +13,10 @@ public class TicMarble {
 	public TicPlayer owner;
 	public String area;
 	public int pos;
-
+	private int id;
+	
 	TicMarble(int _id, TicPlayer _owner) {
+		id = _id;
 		owner = _owner;
 	}
 	
@@ -33,6 +35,10 @@ public class TicMarble {
 			}
 		}
 		return false;
+	}
+
+	public int getId() {
+		return id;
 	}
 
 }

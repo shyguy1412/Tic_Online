@@ -13,18 +13,26 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>. */
+
 var connection;
 
-function connectToServer() {
+function connectToServer(conn) {
 
-  connection = new WebSocket('ws://localhost:4444');
-  connection.sendJSON = function(json){
+  // conn_a = new WebSocket('ws://localhost:4444');
+  // conn_b = new WebSocket('ws://localhost:4444');
+  // conn_c = new WebSocket('ws://localhost:4444');
+  // conn_d = new WebSocket('ws://localhost:4444');
+  // connection = conn_a//;new WebSocket('ws://localhost:4444');
+
+  conn = new WebSocket('ws://localhost:4444');
+
+  conn.sendJSON = function(json){
     var strData = JSON.stringify(json);
     connection.send(strData);
     console.log("CLIENT: " + strData);
   }
 
-  connection.sendChatMessage = function(msg){
+  conn.sendChatMessage = function(msg){
     var data = {
       action: "msg_global",
       msg: {
@@ -34,36 +42,37 @@ function connectToServer() {
         text: msg
       }
     }
-    connection.sendJSON(data);
+    conn.sendJSON(data);
   }
 
-  connection.onopen = function () {
+  conn.onopen = function () {
     //INIT CONNECTION
     var data = {
       action: "init",
       user_id: user_id,
       room_code: room_code
     };
-    connection.sendJSON(data);
+    conn.sendJSON(data);
   };
 
   // Log errors
-  connection.onerror = function (error) {
+  conn.onerror = function (error) {
     console.log('WebSocket Error ' + error);
   };
 
   // Log messages from the server
-  connection.onmessage = function (e) {
-    console.log('SERVER:');
+  conn.onmessage = function (e) {
+    console.log('SERVER:' + e.data);
     let data = JSON.parse(e.data);
     console.log(data);
     switch (data.action) {
       case "update_board":
+      console.log("UPDATE");
       updateBoard(data.data);
       break;
       case 'team_select':
       if(data.type == "request"){
-        var interface = document.getElementById('interface_wrapper');
+        var interface = document.getElementById('teamButtons');
         interface.innerHTML = `
         <button type="button" name="team1" onclick="selectTeam(1)">Team 1</button>
         <button type="button" name="team2" onclick="selectTeam(2)">Team 2</button>
@@ -79,6 +88,7 @@ function connectToServer() {
 
     }
   };
+  return conn;
 }
 
 function selectTeam(team) {
@@ -90,7 +100,7 @@ function selectTeam(team) {
   };
   connection.sendJSON(data);
 
-  var interface = document.getElementById('interface_wrapper');
+  var interface = document.getElementById('teamButtons');
   interface.innerHTML = "";
 
 }

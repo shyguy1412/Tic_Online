@@ -91,6 +91,11 @@ class Field{
       }
       let zoom = field.hovered?width*0.005:0;
       ellipse(field.pos.x, field.pos.y, Field.radius + zoom, Field.radius + zoom);
+      textAlign(CENTER, CENTER);
+      noStroke();
+      fill(0);
+      textSize(12);
+      // text(field.id, field.pos.x, field.pos.y);
       pop();
     });
   }

@@ -89,7 +89,6 @@ function updateBoard(data){
       break;
     }
   }
-  console.log(startAreas[0]);
   loop();
 }
 
@@ -124,6 +123,7 @@ function calc_canvas_size(){
 window.addEventListener('resize', updateCanvasSize);
 function updateCanvasSize(){
   let c_size = calc_canvas_size();
+  resizeCanvas(c_size, c_size);
   Field.radius = width * 0.038;
 
   let newArea = new Area(playingArea.id);
@@ -151,6 +151,6 @@ function updateCanvasSize(){
     });
   });
 
-  resizeCanvas(c_size, c_size);
   loop();
+  console.log(true);
 }
