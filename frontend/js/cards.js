@@ -56,18 +56,19 @@ var swap_card_html = `
 
 
 
-// var hand_cards = [
-//   split_card_html,
-//   swap_card_html,
-//   skip_card_html,
-//   backwards_card_html,
-//   enter_card_html.replaceAll("&", "13"),
-//   number_card_html.replaceAll("&", "1")
-// ]
-//
-// hand_cards.forEach((item, i) => {
-//     $("#hand_cards").append(item.replaceAll("$", i));
-// });
+var hand_cards = [
+  split_card_html,
+  swap_card_html,
+  skip_card_html,
+  backwards_card_html,
+  enter_card_html.replaceAll("&", "13"),
+  number_card_html.replaceAll("&", "1"),
+  number_card_html.replaceAll("&", "5")
+]
+
+hand_cards.forEach((item, i) => {
+    $("#hand_cards").append(item.replaceAll("$", i));
+});
 
 function addCard(card) {
   var html;

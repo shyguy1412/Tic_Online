@@ -37,6 +37,7 @@ function setup() {
 
   updateCanvasSize();
   connection = connectToServer(connection);
+  enableCards();
 }
 
 function draw() {

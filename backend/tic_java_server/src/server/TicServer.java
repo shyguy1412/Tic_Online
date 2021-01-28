@@ -29,6 +29,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import game.TicGame;
+import game.board.TicPlayingBoard;
 
 /**
  * 
@@ -68,8 +69,6 @@ public class TicServer extends WebSocketServer {
 		JSONObject data = new JSONObject(message);
 		TicClient client = conns.getClientFromConnection(conn);
 
-		TicServer.printDebug("Message from client: " + data);
-
 		switch (data.getString("action")) {
 		case "init":
 			this.initClient(client, data);
@@ -92,6 +91,9 @@ public class TicServer extends WebSocketServer {
 			break;
 		case "team_select":
 			client.player.game.selectTeam(client, data.getInt("team_id"));
+			break;
+		case "playability":
+			client.player.game.checkPlayability(client.player, data.getJSONArray("cards"));
 			break;
 		}
 	}
@@ -153,19 +155,7 @@ public class TicServer extends WebSocketServer {
 			} else {
 //				this.sendTeamSelect(client);
 			}
-			game.selectTeam(client, 1); // FOR TESTING
-			JSONObject cardData = new JSONObject();
-			JSONArray cards = new JSONArray();
-			for(int i = 0; i < 3; i++) {
-				JSONObject card = new JSONObject();
-				card.put("id", i);
-				card.put("playable", i%2==0);
-				cards.put(card);
-			}
-			cardData.put("action", "playability");
-			cardData.put("cards", cards);
-			client.socket.send(cardData.toString());
-			
+			game.selectTeam(client, 1); // FOR TESTING			
 			return; // FOR TESTING
 		}
 

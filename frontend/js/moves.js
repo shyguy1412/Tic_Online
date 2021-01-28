@@ -26,85 +26,24 @@ ENTER: have at least 1 marble in your homearea
 SWAP: have at least 1 marble on the playing area. playing area must have at least 2 marbles
 */
 
-// function checkMoveOptions() {
-//
-//   var marbles = [];
-//   //conditions
-//   var marbleInPlay = false;
-//   var marbleInPlayingArea = false;
-//   var marbleInStartArea = false;
-//   var marblesInPlayingArea = 0;
-//   //Get own marbles and fill conditions
-//   playingArea.fields.forEach((f) => {
-//     if(f.occupant != null){
-//       marblesInPlayingArea++;
-//       if(f.occupant.user_id == user_id){
-//         marbles.push(f.occupant);
-//         marbleInPlay = true;
-//       }
-//     }
-//   });
-//
-//   homeAreas.forEach((h) => {
-//     h.fields.forEach((f) => {
-//       if(f.occupant != null && f.occupant.user_id == user_id){
-//         marbles.push(f.occupant);
-//         marbleInPlay = marbleInPlay || true; //true will be replaced with marble.done
-//       }
-//     });
-//   });
-//
-//   startAreas.forEach((h) => {
-//     h.fields.forEach((f) => {
-//       if(f.occupant != null && f.occupant.user_id == user_id){
-//         marbles.push(f.occupant);
-//         marbleInStartArea = true
-//       }
-//     });
-//   });
-//
-//   console.log(marbles);
-//   console.log(marbleInPlay);
-//   console.log(marbleInPlayingArea);
-//   console.log(marbleInStartArea);
-//   console.log(marblesInPlayingArea);
-//
-//   // var type = $(this).prop("class").split(" ")[1].split("_")[1];
-//   // var playable = false;
-//   // console.log(type);
-//   // switch (type) {
-//   //   case "enter":
-//   //   playable = marbleInStartArea;
-//   //   break;
-//   //   case "number":
-//   //   var value = $("#" + $(this).prop("id") + "_value").html();
-//   //   playable = canMoveMarble(value, marbles);
-//   //   break;
-//   //   case "backwards":
-//   //   playable = canMoveMarble(-4);
-//   //   break;
-//   //   case "skip":
-//   //   playable = canMoveMarble(8) || marbleInPlay;
-//   //   break;
-//   //   case "split":
-//   //   playable = marbleInPlay;
-//   //   break;
-//   //   case "undo":
-//   //   //last card playable
-//   //   break;
-//   //   case "swap":
-//   //   playable = marbleInPlayingArea && marblesInPlayingArea > 1;
-//   //   break;
-//   // }
-//   //iterate through all cards and set playability
-//   $(".tic_card").each(function(i){
-//     if(!playable){
-//       $(this).addClass("tic_unplayable");
-//     } else {
-//       $(this).removeClass("tic_unplayable");
-//     }
-//   })
-// }
+function checkPlayability() {
+  var data = {
+    action: "playability",
+    cards: []
+  }
+  $(".tic_card").each(function(i){
+    var id = $(this).prop("id").split("_")[0];
+    var value = $("#" + id + "_value").html();
+    var type = $(this).prop("class").split(" ")[1].split("_")[1];
+    var card = {
+      id:id,
+      value:value,
+      type:type
+    }
+    data.cards.push(card);
+  });
+  connection.sendJSON(data);
+}
 
 function enableCards() {
 
@@ -116,6 +55,7 @@ function enableCards() {
     onMarbleClick(this, {type: "number", id:id, value:value});
     onDoubleClick(this, buildMove({move:"enter",id:id}));
     if(!state.busy){
+      console.log("SELECT");
       $(this).addClass("tic_selected");
       state.busy = true;
     }

@@ -87,19 +87,20 @@ function connectToServer(conn) {
       state.busy = false;
       break;
       case 'playability':
+      console.log(data);
       data.cards.forEach((c) => {
         var card = $("#" + c.id + "_card");
         if(c.playable){
-          card.addClass("tic_unplayable");
-        } else {
           card.removeClass("tic_unplayable");
+        } else {
+          card.addClass("tic_unplayable");
         }
       });
       break;
       case 'deal':{
         data.cards.forEach((c) => {
           console.log(c);
-          addCard(c);
+          //addCard(c);
         });
 
       }

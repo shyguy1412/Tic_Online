@@ -2,7 +2,7 @@ package game.board;
 
 public class TicArea {
 
-	static public String PLAYING__AREA = "playingArea";
+	static public String PLAYING_AREA = "playingArea";
 	static public String START_AREA = "startArea";
 	static public String HOME_AREA = "homeArea";
 

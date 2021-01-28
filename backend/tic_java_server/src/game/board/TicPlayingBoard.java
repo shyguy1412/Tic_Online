@@ -11,7 +11,7 @@ public class TicPlayingBoard {
 	private TicArea[] startAreas;;
 
 	public TicPlayingBoard() {
-		playingArea = new TicArea(TicArea.PLAYING__AREA, 60);
+		playingArea = new TicArea(TicArea.PLAYING_AREA, 60);
 		homeAreas = new TicArea[4];
 		startAreas = new TicArea[4];
 
@@ -46,7 +46,7 @@ public class TicPlayingBoard {
 	}
 
 	public boolean swapMarbles(TicMarble marble1, TicMarble marble2) {
-		if (!marble1.area.contains(TicArea.PLAYING__AREA) || !marble2.area.contains(TicArea.PLAYING__AREA)) {
+		if (!marble1.area.contains(TicArea.PLAYING_AREA) || !marble2.area.contains(TicArea.PLAYING_AREA)) {
 			return false;
 		}
 		int pos1 = marble1.pos;
@@ -90,100 +90,95 @@ public class TicPlayingBoard {
 		}
 		return result;
 	}
-
-	public boolean moveMarbleBy(TicMarble marble, int amount) {
-		if (marble.area.contains(TicArea.HOME_AREA)) {
-			int finalPos = marble.pos + amount;
-			if (amount < 0) {
-				if (this.marbleInHomeBetween(finalPos, marble.pos - 1, this.getHomeArea(marble.owner.getId()))) {
-					this.getHomeArea(marble.owner.getId()).fields[finalPos].place(marble);
-					return true;
-				}
-				return false;
-			} else {
-				if (this.marbleInHomeBetween(marble.pos + 1, finalPos, this.getHomeArea(marble.owner.getId()))) {
-					this.getHomeArea(marble.owner.getId()).fields[finalPos].place(marble);
-					return true;
-				}
-				return false;
-			}
-		} else if (marble.area.equals(TicArea.PLAYING__AREA))
-
-		{
-			int newPos = (marble.pos + amount) % 60;
-			while (newPos < 0) {
-				newPos += 60;
-			}
-//		TicServer.printDebug(marble.pos + ":" + newPos);
-			boolean canMove = true;
-			if (Math.abs(amount) > 1) canMove = checkForMarblesBetween(marble.pos, amount);
-//		TicServer.printDebug(marble.pos + ":" + newPos + ":" + canMove);
-			if (canMove) {
-				if (this.tryMoveIntoHome(marble, amount)) {
-					return true;
-				}
-				// check if on or passing homefield
-				// check if rest of moves can be done in home
-				this.playingArea.fields[newPos].place(marble);
-			}
-			return canMove;
+	
+	public boolean canMoveAMarble(TicMarble[] marbles, int amount) {
+		for(TicMarble m : marbles) {
+			if(m.area.contains(TicArea.START_AREA))continue;
+			boolean canMoveIntoHome = this.canMoveIntoHome(m, amount);
+			boolean canMove = this.canMoveMarbleBy(m, amount);
+			boolean canMoveInHome = this.canMoveMarbleInHome(m, amount);
+			if(canMove || canMoveIntoHome || canMoveInHome)return true;
 		}
 		return false;
 	}
 
-	public boolean tryMoveIntoHome(TicMarble marble, int offset) {
-		if (!marble.hasMoved) // can only enter home if has moved before
-			return false;
-		int entryPoint = marble.owner.entryPoint;
-		if (marble.pos == entryPoint) {
-			int steps = Math.abs(offset) - 1;
-			TicServer.printDebug(steps);
-			if (this.marbleInHomeBetween(0, steps, this.getHomeArea(marble.owner.getId()))){
-				this.getHomeArea(marble.owner.getId()).fields[steps].place(marble);
-				for(TicField f : this.getArea(marble.area).fields) {
-					TicServer.printDebug(f.hasOccupant());
-				}
+	public boolean moveMarbleBy(TicMarble marble, int amount) {
+		if (marble.area.contains(TicArea.HOME_AREA) && this.canMoveMarbleInHome(marble, amount)) {
+			int finalPos = marble.pos + amount;
+			this.getHomeArea(marble.owner.getId()).fields[finalPos].place(marble);
+			return true;
+		} else if (this.canMoveMarbleBy(marble, amount)) {
+			if (this.canMoveIntoHome(marble, amount)) {
+				this.moveIntoHome(marble, amount);
 				return true;
 			}
-		} else {
-
-		}
-		boolean backwards = false;
-		boolean entryPointFound = false;
-		int start = marble.pos;
-		if (offset < 0) { // from end to start instead start to end
-			start += offset;
-			offset *= -1;
-			backwards = true;
-		}
-		int steps = 0; // amount of steps taken before entrypoint is found
-		for (int i = start + 1; (i < start + offset) && !entryPointFound; i++, steps++) {
-			int index = i % 60;
-			while (index < 0) {
-				index += 60;
+			int finalPos = (marble.pos + amount) % 60;
+			while (finalPos < 0) {
+				finalPos += 60;
 			}
-			if (index == entryPoint) {
-				entryPointFound = true;
-				TicServer.printDebug("ENTRY POINT FOUND");
-			}
-		}
-		if (!entryPointFound) return false;
-		//////////
-		// Adjust steps to real value
-		if (backwards) steps = offset - steps;
-		// calculate how many steps are left to be taken
-		if(marble.pos != entryPoint) {
-			steps++;
-		}
-		int remainingSteps = Math.abs(offset - steps);
-
-		TicServer.printDebug("HOME ENTRY DATA: " + steps + ":" + offset + ":" + remainingSteps);
-
-		if (this.marbleInHomeBetween(0, remainingSteps, this.getHomeArea(marble.owner.getId()))) {
-			this.getHomeArea(marble.owner.getId()).fields[remainingSteps].place(marble);
+			this.getPlayingArea().fields[finalPos].place(marble);
 			return true;
 		}
 		return false;
+	}
+
+	public boolean moveIntoHome(TicMarble marble, int amount) {
+		if(this.canMoveIntoHome(marble, amount)) {
+			int index = Math.abs(amount) - this.distanceFromHome(marble, amount>0) - 1;
+			this.getHomeArea(marble.owner.getId()).fields[index].place(marble);
+			return true;
+		}
+		return false;
+	}
+
+	public int distanceFromHome(TicMarble marble, boolean forwards) {
+		int dist = 0;
+		int entryPoint = marble.owner.entryPoint;
+		if (forwards) {
+			dist = Math.abs((entryPoint + 60) - marble.pos) % 60;
+		} else {
+			dist = Math.abs(marble.pos - entryPoint) % 60;
+		}
+		return dist;
+	}
+
+	public boolean canMoveMarbleInHome(TicMarble marble, int amount) {
+		int finalPos = marble.pos + amount;
+		if (amount < 0 && this.marbleInHomeBetween(finalPos, marble.pos - 1, this.getHomeArea(marble.owner.getId()))) {
+			return true;
+		} else if (this.marbleInHomeBetween(marble.pos + 1, finalPos, this.getHomeArea(marble.owner.getId()))) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean canMoveMarbleBy(TicMarble marble, int amount) {
+		if (marble.area != TicArea.PLAYING_AREA) return false;
+		int newPos = (marble.pos + amount) % 60;
+		while (newPos < 0) {
+			newPos += 60;
+		}
+		boolean canMove = true;
+		if (Math.abs(amount) > 1) canMove = checkForMarblesBetween(marble.pos, amount);
+		return canMove;
+	}	
+	
+	public boolean canMoveIntoHome(TicMarble marble, int amount) {
+		if (!marble.hasMoved) return false;// can only enter home if has moved before
+
+		int distFromHome = this.distanceFromHome(marble, amount > 0);
+
+		if (distFromHome > Math.abs(amount)) {
+			return false;
+		}
+		
+		if (marble.pos == marble.owner.entryPoint) {
+			return this.marbleInHomeBetween(0, Math.abs(amount)-1, this.getHomeArea(marble.owner.getId()));
+		} else {
+			int remainingSteps = Math.abs(amount) - distFromHome;
+			return this.marbleInHomeBetween(0, remainingSteps-1, this.getHomeArea(marble.owner.getId()));
+
+		}
 	}
 
 	public boolean marbleInHomeBetween(int start, int stop, TicArea homeArea) {

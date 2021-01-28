@@ -86,7 +86,6 @@ public class TicDeck {
 			stack.remove(0);
 		}
 		data.put("cards", cards);
-		TicServer.printDebug(data.toString());
 		player.client.socket.send(data.toString());
 	}
 }

@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import game.board.TicArea;
+import game.board.TicField;
 import game.board.TicPlayingBoard;
 import game.card.TicDeck;
 import game.player.TicMarble;
@@ -38,7 +39,6 @@ public class TicGame {
 	 * @return False if game is already full
 	 */
 	public boolean addPlayer(TicClient client) {
-		TicServer.printDebug("Adding player: " + client.userID + " to: " + roomCode);
 		TicPlayer player = new TicPlayer(client);
 		for (TicPlayer p : players) {
 			if (p != null && p.client.userID.equals(client.userID)) return false;
@@ -48,8 +48,6 @@ public class TicGame {
 				players[i] = player;
 				client.player = player;
 				client.player.game = this;
-				TicServer.printDebug("Player added successfully");
-//				printDebug();
 				return true;
 			}
 		}
@@ -65,11 +63,9 @@ public class TicGame {
 			client.player = p;
 			if (true) continue;
 //			//////////
-//			TicServer.printDebug(p.client.userID + ":" + client.userID);
 			if (p.client.userID.equals(client.userID)) {
 				p.client = client;
 				client.player = p;
-				TicServer.printDebug("Player reconnected successfully");
 				return true;
 			}
 		}
@@ -315,6 +311,63 @@ public class TicGame {
 
 	public boolean hasStarted() {
 		return started;
+	}
+
+	public void checkPlayability(TicPlayer player, JSONArray cards) {
+		TicMarble[] marbles = player.marbles;
+		boolean marbleInPlay = false;
+		boolean marbleInPlayingArea = false;
+		boolean marbleInStartArea = false;
+		int marblesInPlayingArea = 0;
+		for (TicMarble m : marbles) {
+			marbleInPlayingArea |= m.area.equals(TicArea.PLAYING_AREA);
+			marbleInStartArea |= m.area.contains(TicArea.START_AREA);
+			marbleInPlay |= !m.area.contains(TicArea.START_AREA) && !m.done;
+		}
+		for (TicField f : board.getPlayingArea().fields) {
+			marblesInPlayingArea += f.hasOccupant() ? 1 : 0;
+		}
+		
+		TicServer.printDebug(marbleInPlay + ":"  + marbleInPlayingArea + ":" + marbleInStartArea + ":" + marblesInPlayingArea);
+		
+		JSONObject cardData = new JSONObject();
+		JSONArray responsCards = new JSONArray();
+		cardData.put("action", "playability");
+		cardData.put("cards", responsCards);
+		
+		for (int i = 0; i < cards.length(); i++) {
+			boolean playable = false;
+			int value;
+			String type = cards.getJSONObject(i).getString("type");
+			switch (type) {
+			case "enter":
+				playable = marbleInStartArea;
+				break;
+			case "backwards":
+			case "number":
+				value = Integer.parseInt(cards.getJSONObject(i).getString("value"));
+				playable = this.board.canMoveAMarble(marbles, value);
+				break;
+			case "skip":
+				playable = marbleInPlayingArea;
+				break;
+			case "split":
+				playable = marbleInPlay;
+				break;
+			case "undo":
+				// last card playable
+				break;
+			case "swap":
+				playable = marbleInPlayingArea && marblesInPlayingArea > 1;
+				break;
+			}
+			TicServer.printDebug(type + ":" + playable);
+			JSONObject card = new JSONObject();
+			card.put("id", cards.getJSONObject(i).getString("id"));
+			card.put("playable", playable);
+			responsCards.put(card);
+		}
+		player.client.socket.send(cardData.toString());
 	}
 
 }

@@ -100,6 +100,27 @@ function createFieldsArc(x, y, r, amt, arr,  angle=360, angleOff=0){
   }
 }
 
+function getArea(area){
+  switch (area.split("_"[0])) {
+    case 'playingArea':
+    return playingArea;
+    break;
+    default:
+    let area;
+    homeAreas.forEach((a) => {
+      if(a.id == area){
+        area = a;
+      }
+    });
+    homeAreas.forEach((a) => {
+      if(a.id == area){
+        area = a;
+      }
+    });
+    return area;
+  }
+}
+
 function resetFields(){
   ///CLEARING///
   Field.clear(playingArea.fields);

@@ -14,6 +14,8 @@ public class TicMarble {
 	public String area;
 	public int pos;
 	private int id;
+
+	public boolean done = false;
 	
 	TicMarble(int _id, TicPlayer _owner) {
 		id = _id;
