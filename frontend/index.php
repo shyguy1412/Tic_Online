@@ -45,7 +45,7 @@ $room_code = isset($_GET['room_code']) ? $_GET['room_code'] : "";
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani&display=swap" rel="stylesheet">
 
   <!-- Site Specific CSS -->
-  <link type="text/css" rel="stylesheet" href="http://localhost/testenv/Tic_Online/src/css/styles.css">
+  <link type="text/css" rel="stylesheet" href="/css/styles.css">
 
   <!-- P5 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.2.0/p5.min.js"></script>
@@ -91,7 +91,7 @@ $room_code = isset($_GET['room_code']) ? $_GET['room_code'] : "";
 
 
 </body>
-<script type="text/javascript" src="http://localhost/testenv/Tic_Online/src/js/functions.js"></script>
+<script type="text/javascript" src="/js/functions.js"></script>
 <script>
 
 var viewportWidth = $(window).width();
@@ -158,23 +158,32 @@ function enterRoom(){
 
 
 function createRoom() {
-  if(!checkUsername())return;
-  showError("", "username_error_field");
+  var userCheck = checkUsername();
+  if(!userCheck)return;
+  clearError("nickname_field");
+  clearError("room_code_field");
+
   var username = $('#nickname_field').val();
-  var xhr = new XMLHttpRequest();
-  xhr.open("POST", "index-ajax.php");
-  xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  var room_code = $('#room_code_field').val();
 
-  xhr.onload = function(){
-    var data = JSON.parse(this.responseText);
-    if(data.success == "false"){
-      showError(data.msg, "roomcode_error_field");
-      return;
+  $.post(
+    "index-ajax.php",
+    {
+      action: 'create',
+      data: room_code,
+      username: username
+    },
+    function( data ) {
+      data = JSON.parse(data);
+      console.log(data);
+      if(data.success == "true"){
+        window.location.assign('tic.php?room_code='+data.room_code);
+      } else {
+        showError(data.msg, "room_code_field");
+        return;
+      }
     }
-    window.location.assign(`tic.php/?room_code=${data.room_code}`)
-  }
-  xhr.send(`username=${username}&action=create`);
+  );
 }
-
 </script>
 </html>

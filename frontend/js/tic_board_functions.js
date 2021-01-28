@@ -152,5 +152,4 @@ function updateCanvasSize(){
   });
 
   loop();
-  console.log(true);
 }

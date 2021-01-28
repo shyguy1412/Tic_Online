@@ -17,20 +17,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 session_start();
 
-$databaseInfo = array(
-  "ip" => "localhost",
-  "dbusr" => "root",
-  "pass" => "",
-  "table" => "tic_online"
-);
+require_once("tic/db.php");
 
 if(isset($_POST['username']) && isset($_POST['action'])){
-
-  $mysqli = new mysqli($databaseInfo['ip'], $databaseInfo['dbusr'], $databaseInfo['pass'], $databaseInfo['table']);
-  if ($mysqli->connect_errno) {
-    die("Verbindung fehlgeschlagen: " . $mysqli->connect_error);
-  }
-  $mysqli->set_charset("utf8");
 
   $_SESSION['username'] = $_POST['username'];
 
@@ -45,12 +34,18 @@ if(isset($_POST['username']) && isset($_POST['action'])){
     $strQuery = "INSERT INTO rooms (room_code, status) VALUES (?, 'active')";
     $statement = $mysqli->prepare($strQuery);
     $statement->bind_param('s', $room_code);
-    $statement->execute();
 
-    $strQuery = "INSERT INTO users (name, status) VALUES (?, 'active')";
+    if (!$statement->execute()) {
+      echo "Execute failed: (" . $statement->errno . ") " . $statement->error;
+    }
+
+    $strQuery = "INSERT INTO users (name, status, room) VALUES (?, 'active', ?)";
     $statement = $mysqli->prepare($strQuery);
-    $statement->bind_param('s', $_POST['username']);
-    $statement->execute();
+    $statement->bind_param('ss', $_POST['username'], $room_code);
+
+    if (!$statement->execute()) {
+      echo "Execute failed: (" . $statement->errno . ") " . $statement->error;
+    }
 
     $user_id = $statement->insert_id;
 
@@ -68,13 +63,23 @@ if(isset($_POST['username']) && isset($_POST['action'])){
     break;
 
     case('enter'):
-
     $room_code = $_POST['data'];
-    $strQuery = 'SELECT count(*) AS success FROM rooms WHERE room_code=?';
-    $statement = $mysqli->prepare($strQuery);
-    $statement->bind_param('s', $room_code);
-    $statement->execute();
-    $result = $statement->get_result()->fetch_assoc()['success'];
+    /* Prepared statement, stage 1: prepare */
+    if (!($statement = $mysqli->prepare("SELECT COUNT(*) AS result FROM rooms WHERE `room_code`=(?)"))) {
+      echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+    }
+
+    /* Prepared statement, stage 2: bind and execute */
+    if (!$statement->bind_param('s', $room_code)) {
+      echo "Binding parameters failed: (" . $statement->errno . ") " . $statement->error;
+    }
+
+    if (!$statement->execute()) {
+      echo "Execute failed: (" . $statement->errno . ") " . $statement->error;
+    }
+
+    $result = $statement->get_result()->fetch_assoc()['result'];
+    $statement->close();
     if($result == 0){
       $return_data = array(
         'success' => 'false',
@@ -84,12 +89,16 @@ if(isset($_POST['username']) && isset($_POST['action'])){
       die();
     }
 
-    $strQuery = "INSERT INTO users (name, status) VALUES (?, 'active')";
+    $strQuery = "INSERT INTO users (name, status, room) VALUES (?, 'active', ?)";
     $statement = $mysqli->prepare($strQuery);
-    $statement->bind_param('s', $_POST['username']);
-    $statement->execute();
+    $statement->bind_param('ss', $_POST['username'], $room_code);
+
+    if (!$statement->execute()) {
+      echo "Execute failed: (" . $statement->errno . ") " . $statement->error;
+    }
 
     $user_id = $statement->insert_id;
+    $statement->close();
 
     $return_data = array(
       'success' => 'true',
@@ -97,6 +106,7 @@ if(isset($_POST['username']) && isset($_POST['action'])){
       'user_id' => $user_id
     );
 
+    $_SESSION['username'] = $_POST['username'];
     $_SESSION['room_code'] = $room_code;
     $_SESSION['user_id'] = $user_id;
 

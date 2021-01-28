@@ -17,11 +17,12 @@
 
 session_start();
 
-if((!isset($_SESSION['user_id']) || !isset($_SESSION['username'])) && isset($_GET['room_code'])){
-  header('Location: http://localhost/testenv/Tic_Online/src/index.php/?room_code=' . $_GET['room_code']);
+if(!(isset($_SESSION['user_id']) && isset($_SESSION['username'])) && isset($_GET['room_code'])){
+  echo "test";
+  header('Location: /index.php?room_code=' . $_GET['room_code']);
   die();
 } else if (!isset($_GET['room_code'])){
-  header('Location: http://localhost/testenv/Tic_Online/src/index.php');
+  header('Location: /index.php');
   die();
 }
 ?>
@@ -55,8 +56,8 @@ if((!isset($_SESSION['user_id']) || !isset($_SESSION['username'])) && isset($_GE
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani&display=swap" rel="stylesheet">
 
 
-  <link type="text/css" rel="stylesheet" href="http://localhost/testenv/Tic_Online/src/css/styles.css">
-  <link type="text/css" rel="stylesheet" href="http://localhost/testenv/Tic_Online/src/css/cards.css">
+  <link type="text/css" rel="stylesheet" href="/css/styles.css">
+  <link type="text/css" rel="stylesheet" href="/css/cards.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.2.0/p5.min.js"></script>
 </head>
 <body>
@@ -161,11 +162,11 @@ console.log("CLIENT ID: " + user_id);
 console.log("ROOM CODE: " + room_code);
 console.log("USERNAME: " + client_username);
 </script>
-<script type="text/javascript" src="http://localhost/testenv/Tic_Online/src/js/cards.js"></script>
-<script type="text/javascript" src="http://localhost/testenv/Tic_Online/src/js/functions.js"></script>
-<script type="text/javascript" src="http://localhost/testenv/Tic_Online/src/js/connection.js"></script>
-<script type="text/javascript" src="http://localhost/testenv/Tic_Online/src/js/moves.js"></script>
-<script type="text/javascript" src="http://localhost/testenv/Tic_Online/src/js/tic_board_classes.js"></script>
-<script type="text/javascript" src="http://localhost/testenv/Tic_Online/src/js/tic_board_functions.js"></script>
-<script type="text/javascript" src="http://localhost/testenv/Tic_Online/src/js/tic_board.js"></script>
+<script type="text/javascript" src="/js/cards.js"></script>
+<script type="text/javascript" src="/js/functions.js"></script>
+<script type="text/javascript" src="/js/connection.js"></script>
+<script type="text/javascript" src="/js/moves.js"></script>
+<script type="text/javascript" src="/js/tic_board_classes.js"></script>
+<script type="text/javascript" src="/js/tic_board_functions.js"></script>
+<script type="text/javascript" src="/js/tic_board.js"></script>
 </html>

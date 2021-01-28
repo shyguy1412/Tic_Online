@@ -18,18 +18,13 @@ var connection;
 
 function connectToServer(conn) {
 
-  // conn_a = new WebSocket('ws://localhost:4444');
-  // conn_b = new WebSocket('ws://localhost:4444');
-  // conn_c = new WebSocket('ws://localhost:4444');
-  // conn_d = new WebSocket('ws://localhost:4444');
-  // connection = conn_a//;new WebSocket('ws://localhost:4444');
-
-  conn = new WebSocket('ws://localhost:4444');
+  conn = new WebSocket('ws://localhost:8080');
+  // conn = new WebSocket('wss://tic.nilsramstoeck.net/ws/');
 
   conn.sendJSON = function(json){
     var strData = JSON.stringify(json);
     connection.send(strData);
-    console.log("CLIENT: " + strData);
+    // console.log("CLIENT: " + strData);
   }
 
   conn.sendChatMessage = function(msg){
@@ -62,12 +57,12 @@ function connectToServer(conn) {
 
   // Log messages from the server
   conn.onmessage = function (e) {
-    console.log('SERVER:' + e.data);
+    // console.log('SERVER:');
     let data = JSON.parse(e.data);
-    console.log(data);
+    // console.log(data);
     switch (data.action) {
       case "update_board":
-      console.log("UPDATE");
+      // console.log("UPDATE");
       updateBoard(data.data);
       break;
       case 'team_select':
@@ -85,7 +80,29 @@ function connectToServer(conn) {
         }
       }
       break;
+      case 'move_response':
+      if(data.result){
+        $("#" + data.card_id + "_card").addClass("tic_disabled");
+      }
+      state.busy = false;
+      break;
+      case 'playability':
+      data.cards.forEach((c) => {
+        var card = $("#" + c.id + "_card");
+        if(c.playable){
+          card.addClass("tic_unplayable");
+        } else {
+          card.removeClass("tic_unplayable");
+        }
+      });
+      break;
+      case 'deal':{
+        data.cards.forEach((c) => {
+          console.log(c);
+          addCard(c);
+        });
 
+      }
     }
   };
   return conn;

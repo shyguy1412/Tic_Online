@@ -1,23 +1,20 @@
 package game.board;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import game.player.TicMarble;
 import game.player.TicPlayer;
+import server.TicServer;
 
 public class TicPlayingBoard {
 
 	private TicArea playingArea;
 	private TicArea[] homeAreas;
-	private TicArea[] startAreas;
-;
-	
+	private TicArea[] startAreas;;
+
 	public TicPlayingBoard() {
 		playingArea = new TicArea(TicArea.PLAYING__AREA, 60);
 		homeAreas = new TicArea[4];
 		startAreas = new TicArea[4];
-				
+
 	}
 
 	public int addPlayer(TicPlayer player) {
@@ -54,10 +51,10 @@ public class TicPlayingBoard {
 		}
 		int pos1 = marble1.pos;
 		int pos2 = marble2.pos;
-//		System.out.println(pos1 + ":" + pos2);
+//		TicServer.printDebug(pos1 + ":" + pos2);
 //		playingArea.fields[pos1].clear();
 //		playingArea.fields[pos2].clear();
-//		System.out.println(marble1 + ":" + marble2);
+//		TicServer.printDebug(marble1 + ":" + marble2);
 		playingArea.fields[pos1].place(marble2);
 		playingArea.fields[pos2].place(marble1);
 		return true;
@@ -68,7 +65,7 @@ public class TicPlayingBoard {
 			start += offset;
 			offset *= -1;
 		}
-//		System.out.println("Check for marbles: " + start + ":" + offset);
+//		TicServer.printDebug("Check for marbles: " + start + ":" + offset);
 		for (int i = start + 1; i < start + offset; i++) {
 			int index = i % 60;
 			while (index < 0) {
@@ -81,22 +78,46 @@ public class TicPlayingBoard {
 		return true;
 	}
 
+	public boolean splitMoveBy(TicMarble marble, int amount) {
+		boolean result = true;
+		int sign = 1;
+		if (amount < 0) {
+			amount *= -1;
+			sign = -1;
+		}
+		for (int i = 0; i < amount; i++) {
+			result = result && this.moveMarbleBy(marble, 1 * sign);
+		}
+		return result;
+	}
+
 	public boolean moveMarbleBy(TicMarble marble, int amount) {
 		if (marble.area.contains(TicArea.HOME_AREA)) {
-			if (this.canMoveInsideHome(marble.pos, amount, this.getHomeArea(marble.owner.getId()))) {
-				this.getHomeArea(marble.owner.getId()).fields[amount].place(marble);
-				return true;
+			int finalPos = marble.pos + amount;
+			if (amount < 0) {
+				if (this.marbleInHomeBetween(finalPos, marble.pos - 1, this.getHomeArea(marble.owner.getId()))) {
+					this.getHomeArea(marble.owner.getId()).fields[finalPos].place(marble);
+					return true;
+				}
+				return false;
+			} else {
+				if (this.marbleInHomeBetween(marble.pos + 1, finalPos, this.getHomeArea(marble.owner.getId()))) {
+					this.getHomeArea(marble.owner.getId()).fields[finalPos].place(marble);
+					return true;
+				}
+				return false;
 			}
-			return false;
-		} else if (marble.area.equals(TicArea.PLAYING__AREA)) {
+		} else if (marble.area.equals(TicArea.PLAYING__AREA))
+
+		{
 			int newPos = (marble.pos + amount) % 60;
 			while (newPos < 0) {
 				newPos += 60;
 			}
-//		System.out.println(marble.pos + ":" + newPos);
+//		TicServer.printDebug(marble.pos + ":" + newPos);
 			boolean canMove = true;
 			if (Math.abs(amount) > 1) canMove = checkForMarblesBetween(marble.pos, amount);
-//		System.out.println(marble.pos + ":" + newPos + ":" + canMove);
+//		TicServer.printDebug(marble.pos + ":" + newPos + ":" + canMove);
 			if (canMove) {
 				if (this.tryMoveIntoHome(marble, amount)) {
 					return true;
@@ -114,16 +135,27 @@ public class TicPlayingBoard {
 		if (!marble.hasMoved) // can only enter home if has moved before
 			return false;
 		int entryPoint = marble.owner.entryPoint;
-		int start = marble.pos;
+		if (marble.pos == entryPoint) {
+			int steps = Math.abs(offset) - 1;
+			TicServer.printDebug(steps);
+			if (this.marbleInHomeBetween(0, steps, this.getHomeArea(marble.owner.getId()))){
+				this.getHomeArea(marble.owner.getId()).fields[steps].place(marble);
+				for(TicField f : this.getArea(marble.area).fields) {
+					TicServer.printDebug(f.hasOccupant());
+				}
+				return true;
+			}
+		} else {
+
+		}
 		boolean backwards = false;
-		// check if entryPoint is a field thats being passed////
+		boolean entryPointFound = false;
+		int start = marble.pos;
 		if (offset < 0) { // from end to start instead start to end
 			start += offset;
 			offset *= -1;
 			backwards = true;
 		}
-		System.out.println("Check for marbles: " + start + ":" + offset);
-		boolean entryPointFound = marble.pos == entryPoint; //
 		int steps = 0; // amount of steps taken before entrypoint is found
 		for (int i = start + 1; (i < start + offset) && !entryPointFound; i++, steps++) {
 			int index = i % 60;
@@ -132,30 +164,31 @@ public class TicPlayingBoard {
 			}
 			if (index == entryPoint) {
 				entryPointFound = true;
-				System.out.println("ENTRY POINT FOUND");
+				TicServer.printDebug("ENTRY POINT FOUND");
 			}
 		}
 		if (!entryPointFound) return false;
 		//////////
-		// Adjust steps to real values
+		// Adjust steps to real value
 		if (backwards) steps = offset - steps;
-		steps++;
-
 		// calculate how many steps are left to be taken
+		if(marble.pos != entryPoint) {
+			steps++;
+		}
 		int remainingSteps = Math.abs(offset - steps);
 
-		System.out.println("HOME ENTRY DATA: " + steps + ":" + offset + ":" + remainingSteps);
+		TicServer.printDebug("HOME ENTRY DATA: " + steps + ":" + offset + ":" + remainingSteps);
 
-		if (canMoveInsideHome(0, remainingSteps, this.getHomeArea(marble.owner.getId()))) {
+		if (this.marbleInHomeBetween(0, remainingSteps, this.getHomeArea(marble.owner.getId()))) {
 			this.getHomeArea(marble.owner.getId()).fields[remainingSteps].place(marble);
 			return true;
 		}
 		return false;
 	}
 
-	public boolean canMoveInsideHome(int pos, int step, TicArea homeArea) {
-		if (pos + step >= 4) return false;
-		for (int i = pos; i <= pos + step; i++) {
+	public boolean marbleInHomeBetween(int start, int stop, TicArea homeArea) {
+		if (start < 0 || stop >= 4 | stop < start) return false;
+		for (int i = start; i <= stop; i++) {
 			if (homeArea.fields[i].hasOccupant()) {
 				return false;
 			}

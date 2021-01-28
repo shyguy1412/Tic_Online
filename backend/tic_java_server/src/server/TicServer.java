@@ -25,6 +25,7 @@ import java.util.Set;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import game.TicGame;
@@ -36,14 +37,14 @@ import game.TicGame;
  */
 public class TicServer extends WebSocketServer {
 
-	static Set<Integer> stack = new HashSet<Integer>();
-
 	public static void main(String[] args) {
 		TicServer server = new TicServer();
 		server.start();
 	}
 
-	private static int TCP_PORT = 4444;
+	public static final boolean DEBUG = true;
+	
+	private static int TCP_PORT = 8080;
 
 	private TicClientSet conns;
 	private Set<TicGame> games;
@@ -59,7 +60,7 @@ public class TicServer extends WebSocketServer {
 		TicClient client = new TicClient();
 		client.socket = conn;
 		conns.add(client);
-//		System.out.println("New connection from " + conn.getRemoteSocketAddress().getAddress().getHostAddress());
+		TicServer.printDebug("New connection from " + conn.getRemoteSocketAddress().getAddress().getHostAddress());
 	}
 
 	@Override
@@ -67,19 +68,19 @@ public class TicServer extends WebSocketServer {
 		JSONObject data = new JSONObject(message);
 		TicClient client = conns.getClientFromConnection(conn);
 
-//		System.out.println("Message from client: " + data);
+		TicServer.printDebug("Message from client: " + data);
 
 		switch (data.getString("action")) {
 		case "init":
 			this.initClient(client, data);
-			System.out.println();
+			TicServer.printDebug();
 			break;
 		case "move":
 			for (TicGame g : games) {
 				if (data.getString("room_code").equals(g.getRoomCode())) {
 					JSONObject moveData = data.getJSONObject("moveData");
 					moveData.put("user_id", data.getString("user_id"));
-					g.handleMove(moveData);
+					g.handleMove(moveData, client);
 				}
 			}
 			break;
@@ -102,14 +103,14 @@ public class TicServer extends WebSocketServer {
 			conns.remove(conn);
 			// do some thing if required
 		}
-//		System.out.println("ERROR from " + conn.getRemoteSocketAddress().getAddress().getHostAddress());
+		TicServer.printDebug("ERROR from " + conn.getRemoteSocketAddress().getAddress().getHostAddress());
 	}
 
 	@Override
 	public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-		TicClient client = conns.getClientFromConnection(conn);
+//		TicClient client = conns.getClientFromConnection(conn);
 		conns.remove(conn);
-//		System.out.println("Closed connection to " + conn.getRemoteSocketAddress().getAddress().getHostAddress());
+		TicServer.printDebug("Closed connection to " + conn.getRemoteSocketAddress().getAddress().getHostAddress());
 	}
 
 	@Override
@@ -136,7 +137,7 @@ public class TicServer extends WebSocketServer {
 						if(g.hasStarted())g.sendBoardStateToClient(client);
 						else this.sendTeamSelect(client);
 					} else {
-//						System.out.println("GAME IS FULL: " + client.roomCode);
+						TicServer.printDebug("GAME IS FULL: " + client.roomCode);
 					}
 				}
 				found = true;
@@ -146,14 +147,26 @@ public class TicServer extends WebSocketServer {
 		if (!found) {
 			TicGame game = new TicGame(client.roomCode);
 			games.add(game);
-//			addDummyPlayers(game, client); // FOR TESTING
+			addDummyPlayers(game, client); // FOR TESTING
 			if (!game.addPlayer(client)) {
-//				System.out.println("ERROR CREATING GAME: " + client.roomCode);
+				TicServer.printDebug("ERROR CREATING GAME: " + client.roomCode);
 			} else {
-				this.sendTeamSelect(client);
+//				this.sendTeamSelect(client);
 			}
-//			game.selectTeam(client, 1); // FOR TESTING
-//			return; // FOR TESTING
+			game.selectTeam(client, 1); // FOR TESTING
+			JSONObject cardData = new JSONObject();
+			JSONArray cards = new JSONArray();
+			for(int i = 0; i < 3; i++) {
+				JSONObject card = new JSONObject();
+				card.put("id", i);
+				card.put("playable", i%2==0);
+				cards.put(card);
+			}
+			cardData.put("action", "playability");
+			cardData.put("cards", cards);
+			client.socket.send(cardData.toString());
+			
+			return; // FOR TESTING
 		}
 
 	}
@@ -162,7 +175,7 @@ public class TicServer extends WebSocketServer {
 		JSONObject responseData = new JSONObject();
 		responseData.put("action", "team_select");
 		responseData.put("type", "request");
-		System.out.println("Message to client: " + responseData.toString());
+		TicServer.printDebug("Message to client: " + responseData.toString());
 		client.socket.send(responseData.toString());		
 	}
 
@@ -197,9 +210,17 @@ public class TicServer extends WebSocketServer {
 	 */
 	private void sendGlobalMessage(TicClient client, JSONObject data) {
 		TicClient room[] = conns.getClientsInRoom(client.roomCode);
-		System.out.println(room.length);
 		for (TicClient c : room) {
 			c.socket.send(data.getJSONObject("msg").toString());
 		}
+	}
+	
+	public static void printDebug(Object obj) {
+		if(DEBUG)System.out.println(obj);
+	}
+	
+	
+	public static void printDebug() {
+		if(DEBUG)System.out.println();
 	}
 }

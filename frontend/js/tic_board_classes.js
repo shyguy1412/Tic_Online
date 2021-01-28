@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>. */
-
 class Field{
   static radius = 20;
 
@@ -59,6 +58,9 @@ class Field{
     return null;
   }
 
+  static removeEventListeners(){
+    Field.eventTarget = new EventTarget();
+  }
 
   static checkCollision(fields, event){
     let x = mouseX;
@@ -67,7 +69,8 @@ class Field{
       if(field.occupant != null && dist(x, y, field.pos.x, field.pos.y) < this.radius/2){
         field.hovered = true;
         event.data = {
-          marble: field.occupant
+          marble: field.occupant,
+          mouseButton: mouseButton
         }
         Field.eventTarget.dispatchEvent(event);
       }else{

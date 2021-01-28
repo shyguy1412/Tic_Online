@@ -60,6 +60,7 @@ function draw() {
   startAreas.forEach((h) => {
     Field.render(h.fields)
   });
+  // console.log(mouseButton);
   noLoop();
 }
 

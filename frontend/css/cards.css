@@ -27,13 +27,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>. */
   position: relative;
 }
 
-.tic_selected, .tic_card:hover{
+.tic_selected, .tic_hovered{
   bottom: 2vh;
-  color: red;
 }
 
 .tic_disabled{
   display: none !important;
+}
+
+.tic_unplayable{
+  background-color: lightgray;
 }
 
 /*SPLIT CARD*/
@@ -58,7 +61,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>. */
   flex-direction: column;
   justify-content: space-between;
 }
-
 
 .tic_center_align{
   display: table;
