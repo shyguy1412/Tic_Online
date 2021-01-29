@@ -52,7 +52,6 @@ function enableThrowaway(){
     $(this).addClass("tic_throwable");
   });
   $(".tic_card").on("click", function(e){
-    $(this).addClass("tic_throwable");
     var id = $(this).prop("id").split("_")[0];
     var cardValue = $("#" + id + "_value").html();
     onDoubleClick(this, buildMove({move:"throwaway",id:id, value: cardValue}));
@@ -70,6 +69,33 @@ function disableThrowaway(){
     $(this).removeClass("tic_throwable");
   });
 }
+
+function enableSwap(){
+  console.log("ENABLE SWAP");
+  enableHover();
+  $(".tic_card").on("click", function(e){
+    var id = $(this).prop("id").split("_")[0];
+    var cardValue = $("#" + id + "_value").html();
+    onDoubleClick(this, {
+      action:"swap_card",
+      id:id,
+      card_value: cardValue,
+      room_code: room_code,
+      user_id: user_id
+    });
+    if(!state.busy){
+      $(this).addClass("tic_selected");
+      state.busy = true;
+    }
+  });
+}
+
+function disableSwap(){
+  console.log("DISABLE SWAP");
+  disableCards();
+}
+
+
 
 function enableCards() {
   enableHover();
@@ -277,6 +303,7 @@ function buildMove(card){
 }
 
 function disableCards() {
+  console.log("DISABLE CARDS");
   disableHover();
   $(".tic_card").prop("onclick", null).off("click");
   $(".tic_card").removeClass("tic_hovered");
@@ -309,7 +336,7 @@ function onDoubleClick(sender, move){
     disableCards()
     var id = $(sender).prop("id").split("_")[0];
     var cardValue = $("#" + id + "_value").html();
-    move.moveData.card_value = cardValue;
+    if(move.action == "move")move.moveData.card_value = cardValue;
     connection.sendJSON(move);
     return;
   }

@@ -20,6 +20,7 @@ public class TicPlayer {
 	public TicClient client;
 	public TicGame game;
 	public ArrayList<TicCard> cards = new ArrayList<TicCard>();
+	public boolean ready = false;
 
 	public TicPlayer(TicClient _client) {
 		client = _client;

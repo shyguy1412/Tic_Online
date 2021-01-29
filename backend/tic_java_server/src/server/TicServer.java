@@ -78,6 +78,15 @@ public class TicServer extends WebSocketServer {
 					JSONObject moveData = data.getJSONObject("moveData");
 					moveData.put("user_id", data.getString("user_id"));
 					g.handleMove(moveData, client);
+					break;
+				}
+			}
+			break;
+		case "swap_card":
+			for (TicGame g : games) {
+				if (data.getString("room_code").equals(g.getRoomCode())) {
+					g.swapCard(client.player, data);
+					break;
 				}
 			}
 			break;

@@ -4,6 +4,7 @@ public class TicCard {
 	
 	public String type;
 	public int value;
+	public boolean hidden = false;
 	
 	public TicCard(int _value) {
 		value = _value;

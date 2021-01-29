@@ -137,30 +137,32 @@ public class TicGame {
 		TicServer.printDebug("START GAME: " + roomCode);
 		this.board = new TicPlayingBoard();
 		this.deck = new TicDeck();
-		deck.fillStack();
-		deck.shuffle();
 		// INIT PLAYERS AND MARBLES
 		for (TicTeam t : teams) {
 			int i = 0;
 			for (TicPlayer p : t.players) {
 				p.init(t.getId() + i);
-				deck.dealToPlayer(p, 5);
 				i += 2;
 			}
 		}
 		this.sendBoardStateToPlayers();
 		this.started = true;
+		this.startRound();
+	}
+	
+	private void startRound() {
+		deck.fillStack();
+		deck.shuffle();
 		this.turnOfPlayer = (int) (Math.floor(Math.random() * 100)) % 4;
 		this.roundMaster = this.turnOfPlayer;
 		this.sendPlayerInfoToPlayers();
 		TicServer.printDebug("Turn of player: " + this.turnOfPlayer);
 		for (TicPlayer p : players) {
-			if (p.getId() == this.turnOfPlayer) {
-				this.startTurnOf(p.client);
-			}
+			deck.dealToPlayer(p, 5);
+			p.client.socket.send(new JSONObject().put("action", "start_round").toString());
 		}
 	}
-	
+
 	public void handleMove(JSONObject moveData, TicClient client) {
 		String card = moveData.getString("type");
 		// UNDO AFTER GAMEPLAY IS DONE
@@ -281,6 +283,37 @@ public class TicGame {
 		}
 	}
 
+	public void swapCard(TicPlayer player, JSONObject data) {
+		//add card to team partners cards  as hidden
+		player.ready = true;
+		TicPlayer teampartner = null;
+		for(TicPlayer p : player.team.players) {
+			if(p.getId() != player.getId()) {
+				teampartner = p;
+				break;
+			}
+		}
+		TicCard card = new TicCard(Integer.parseInt(data.getString("card_value")));
+		card.hidden = !teampartner.ready;
+		teampartner.cards.add(card);
+		player.removeCard(card.value);
+		//if team partner is ready, send cards
+		if(teampartner.ready) {
+			this.sendCardsToClient(teampartner.client);
+			for(TicCard c : player.cards) {
+				c.hidden = false;
+			}
+			this.sendCardsToClient(player.client);
+		}
+		JSONObject response = new JSONObject();
+		response.put("action", "swap_card_response");
+		response.put("result", teampartner.ready);
+		
+		for(TicPlayer p : players) {
+			if(!p.ready)return;
+		}
+		this.startTurnOf(turnOfPlayer);
+	}	
 	
 	private void startTurnOf(TicClient client) {
 		JSONObject data = new JSONObject();
@@ -304,6 +337,7 @@ public class TicGame {
 		for (int i = 0; i < player.cards.size(); i++) {
 			JSONObject jsonCard = new JSONObject();
 			TicCard ticCard = player.cards.get(i);
+			if(ticCard.hidden)continue;
 			jsonCard.put("type", ticCard.type);
 			jsonCard.put("value", ticCard.value);
 			cards.put(jsonCard);

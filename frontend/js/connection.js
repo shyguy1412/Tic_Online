@@ -93,7 +93,14 @@ function connectToServer(conn) {
           }
         });
       });
-
+      break;
+      case "start_round":
+      enableSwap();
+      break;
+      case "swap_card_response":
+      if(data.result){
+        disableSwap();
+      }
       case 'team_update':
       $(".team_members").html("");
       data.players.forEach((p) => {
@@ -129,6 +136,7 @@ function connectToServer(conn) {
       }
       break;
       case 'deal':{
+        $("#hand_cards").html("");
         data.cards.forEach((c) => {
           console.log(c);
           addCard(c);
