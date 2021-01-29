@@ -96,7 +96,7 @@ function createFieldsArc(x, y, r, amt, arr,  angle=360, angleOff=0){
   for(let i = 0; i < amt; i++){
     let xpos = x + r * cos(radians((i/amt)*angle)+radians(angleOff));
     let ypos = y + r * sin(radians((i/amt)*angle)+radians(angleOff));
-    arr.push(new Field(xpos, ypos, i));
+    arr.push(new FieldObject(i, xpos, ypos));
   }
 }
 

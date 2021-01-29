@@ -45,6 +45,17 @@ function checkPlayability() {
   connection.sendJSON(data);
 }
 
+function enableThrowaway(){
+  $(".tic_card.tic_enter").on("click", function(e){
+    onDoubleClick(this, buildMove({move:"throwaway",id:id}));
+    if(!state.busy){
+      console.log("SELECT");
+      $(this).addClass("tic_selected");
+      state.busy = true;
+    }
+  });
+}
+
 function enableCards() {
 
   //Enter Card

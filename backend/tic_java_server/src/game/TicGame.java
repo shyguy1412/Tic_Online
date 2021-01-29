@@ -360,6 +360,8 @@ public class TicGame {
 			case "swap":
 				playable = marbleInPlayingArea && marblesInPlayingArea > 1;
 				break;
+			case "throwaway":
+				break;
 			}
 			TicServer.printDebug(type + ":" + playable);
 			JSONObject card = new JSONObject();

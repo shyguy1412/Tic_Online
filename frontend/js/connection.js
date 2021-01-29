@@ -90,10 +90,16 @@ function connectToServer(conn) {
       console.log(data);
       data.cards.forEach((c) => {
         var card = $("#" + c.id + "_card");
+        var throwaway = true;
         if(c.playable){
+          throwaway = false;
           card.removeClass("tic_unplayable");
         } else {
           card.addClass("tic_unplayable");
+        }
+        if(throwaway){
+          disableCards();
+          enableThrowaway();
         }
       });
       break;

@@ -13,110 +13,109 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>. */
-class Field{
-  static radius = 20;
 
-  static clickEvent = new Event('click');
-  static hoverEvent = new Event('hover');
-  static eventTarget = new EventTarget();
 
-  constructor(x, y, id) {
-    this.id = id;
-    this.occupant = null;
-    this.selected = false;
-    this.hovered = false;
-    this.pos = {
-      x: x,
-      y: y
-    };
-  }
-
-  static setDrawOptions(){
-    stroke(0);
-    strokeWeight(1);
-    fill(150, 150, 150, 60);
-  }
-
-  static clear(fields){
-    fields.forEach((field) => {
-      field.occupant = null;
-    });
-
-  }
-
-  static getSelectedMarble(fields){
-    let x = mouseX;
-    let y = mouseY;
-    // console.log(fields);
-    for(let i = 0; i < fields.length; i++){
-      if(fields[i].occupant != null){
-        if(fields[i].occupant.selected){
-          return fields[i].occupant;
-        }
-      }
-    }
-    return null;
-  }
-
-  static removeEventListeners(){
-    Field.eventTarget = new EventTarget();
-  }
-
-  static checkCollision(fields, event){
-    let x = mouseX;
-    let y = mouseY;
-    fields.forEach((field) => {
-      if(field.occupant != null && dist(x, y, field.pos.x, field.pos.y) < this.radius/2){
-        field.hovered = true;
-        event.data = {
-          marble: field.occupant,
-          mouseButton: mouseButton
-        }
-        Field.eventTarget.dispatchEvent(event);
-      }else{
-        field.hovered = false;
-      }
-    });
-  }
-
-  static render(fields){
-    Field.setDrawOptions();
-    fields.forEach((field) => {
-      push();
-      if(field.occupant != null){
-        let r = field.occupant.color.r;
-        let g = field.occupant.color.g;
-        let b = field.occupant.color.b;
-        fill(r, g, b);
-        if(field.occupant.selected == true){
-          stroke(255);
-        }
-      }
-      let zoom = field.hovered?width*0.005:0;
-      ellipse(field.pos.x, field.pos.y, Field.radius + zoom, Field.radius + zoom);
-      textAlign(CENTER, CENTER);
-      noStroke();
-      fill(0);
-      textSize(12);
-      // text(field.id, field.pos.x, field.pos.y);
-      pop();
-    });
-  }
+function FieldObject(id, x, y){
+  this.id = id;
+  this.occupant = null;
+  this.selected = false;
+  this.hovered = false;
+  this.pos = {
+    x: x,
+    y: y
+  };
 }
 
-class Area{
-  constructor(id){
-    this.id = id;
-    this.fields = [];
-  }
+var Field = {
+  radius : 20,
+  clickEvent : new Event('click'),
+  hoverEvent : new Event('hover'),
+  eventTarget : new EventTarget()
+}
 
-  place(marble){
-    this.fields.forEach((f) => {
-      if(f.id == marble.pos.id){
-        f.occupant = marble;
-        // console.log("MARBLE PLACED AT: " + this.id + ":"+ marble.pos.id)
-        // console.log(f);
+Field.setDrawOptions = function(){
+  stroke(0);
+  strokeWeight(1);
+  fill(150, 150, 150, 60);
+}
+
+Field.clear = function(fields){
+  fields.forEach((field) => {
+    field.occupant = null;
+  });
+
+}
+
+Field.getSelectedMarble = function(fields){
+  let x = mouseX;
+  let y = mouseY;
+  // console.log(fields);
+  for(let i = 0; i < fields.length; i++){
+    if(fields[i].occupant != null){
+      if(fields[i].occupant.selected){
+        return fields[i].occupant;
       }
-    });
+    }
   }
+  return null;
+}
+
+Field.removeEventListeners = function(){
+  Field.eventTarget = new EventTarget();
+}
+
+Field.checkCollision = function(fields, event){
+  let x = mouseX;
+  let y = mouseY;
+  fields.forEach((field) => {
+    if(field.occupant != null && dist(x, y, field.pos.x, field.pos.y) < this.radius/2){
+      field.hovered = true;
+      event.data = {
+        marble: field.occupant,
+        mouseButton: mouseButton
+      }
+      Field.eventTarget.dispatchEvent(event);
+    }else{
+      field.hovered = false;
+    }
+  });
+}
+
+Field.render = function(fields){
+  Field.setDrawOptions();
+  fields.forEach((field) => {
+    push();
+    if(field.occupant != null){
+      let r = field.occupant.color.r;
+      let g = field.occupant.color.g;
+      let b = field.occupant.color.b;
+      fill(r, g, b);
+      if(field.occupant.selected == true){
+        stroke(255);
+      }
+    }
+    let zoom = field.hovered?width*0.005:0;
+    ellipse(field.pos.x, field.pos.y, Field.radius + zoom, Field.radius + zoom);
+    textAlign(CENTER, CENTER);
+    noStroke();
+    fill(0);
+    textSize(12);
+    // text(field.id, field.pos.x, field.pos.y);
+    pop();
+  });
+}
+
+function Area(id){
+  this.id = id;
+  this.fields = [];
+}
+
+Area.prototype.place = function (marble){
+  this.fields.forEach((f) => {
+    if(f.id == marble.pos.id){
+      f.occupant = marble;
+      // console.log("MARBLE PLACED AT: " + this.id + ":"+ marble.pos.id)
+      // console.log(f);
+    }
+  });
 }

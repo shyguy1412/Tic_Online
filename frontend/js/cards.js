@@ -61,7 +61,7 @@ var hand_cards = [
   swap_card_html,
   skip_card_html,
   backwards_card_html,
-  enter_card_html.replaceAll("&", "13"),
+  // enter_card_html.replaceAll("&", "13"),
   number_card_html.replaceAll("&", "1"),
   number_card_html.replaceAll("&", "5")
 ]
