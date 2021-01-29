@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import game.board.TicArea;
 import game.board.TicField;
 import game.board.TicPlayingBoard;
+import game.card.TicCard;
 import game.card.TicDeck;
 import game.player.TicMarble;
 import game.player.TicPlayer;
@@ -25,12 +26,15 @@ public class TicGame {
 
 	private boolean started = false;
 
+	private int turnOfPlayer; // id of the player whos turn it is
+	private int roundMaster;
+
 	public TicGame(String _roomCode) {
 		roomCode = _roomCode;
 		players = new TicPlayer[4];
 		teams = new TicTeam[2];
-		teams[0] = new TicTeam();
-		teams[1] = new TicTeam();
+		teams[0] = new TicTeam(0);
+		teams[1] = new TicTeam(1);
 	}
 
 	/**
@@ -55,21 +59,27 @@ public class TicGame {
 		return false;
 	}
 
-	@SuppressWarnings("unused")
 	public boolean reconnectPlayer(TicClient client) {
 		for (TicPlayer p : players) {
 //			// TESTING//
-			p.client = client;
-			client.player = p;
-			if (true) continue;
+//			p.client = client;
+//			client.player = p;
+//			if (true) continue;
 //			//////////
 			if (p.client.userID.equals(client.userID)) {
 				p.client = client;
 				client.player = p;
+				if (this.started) {
+					this.sendPlayerInfoToClient(client);
+					this.sendCardsToClient(client);
+					if(p.getId() == this.turnOfPlayer) {
+						this.startTurnOf(client);
+					}
+				}
 				return true;
 			}
 		}
-		if (true) return true; // TESTING
+//		if (true) return true; // TESTING
 		return false;
 	}
 
@@ -83,16 +93,44 @@ public class TicGame {
 		JSONObject responseData = new JSONObject();
 		responseData.put("action", "team_select");
 		responseData.put("type", "response");
+
+		TicPlayer player = client.player;
+		if (player.team != null) {
+			player.team.removePlayer(player);
+		}
+
 		if (!teams[team_id].addPlayer(client.player)) {
 			responseData.put("response", "false");
 		} else {
 			responseData.put("response", "true");
 		}
+
 		client.socket.send(responseData.toString());
 //		printDebug();
-		if (isReadyToStart()) {
+		if (this.isReadyToStart()) {
 			startGame();
+			TicServer.printDebug("START");
 		}
+		for (TicPlayer p : players) {
+			if (p != null) this.sendTeamData(p.client);
+		}
+	}
+
+	public void sendTeamData(TicClient client) {
+
+		JSONObject data = new JSONObject();
+		data.put("action", "team_update");
+		JSONArray jsonPlayers = new JSONArray();
+		for (TicPlayer p : this.players) {
+			if (p != null && p.team != null) {
+				JSONObject player = new JSONObject();
+				player.put("username", p.client.username);
+				player.put("team", p.team.getId());
+				jsonPlayers.put(player);
+			}
+		}
+		data.put("players", jsonPlayers);
+		client.socket.send(data.toString());
 	}
 
 	private void startGame() {
@@ -102,16 +140,29 @@ public class TicGame {
 		deck.fillStack();
 		deck.shuffle();
 		// INIT PLAYERS AND MARBLES
-		for (TicPlayer p : players) {
-			p.init();
-			deck.dealToPlayer(p, 1);
+		for (TicTeam t : teams) {
+			int i = 0;
+			for (TicPlayer p : t.players) {
+				p.init(t.getId() + i);
+				deck.dealToPlayer(p, 5);
+				i += 2;
+			}
 		}
 		this.sendBoardStateToPlayers();
 		this.started = true;
+		this.turnOfPlayer = (int) (Math.floor(Math.random() * 100)) % 4;
+		this.roundMaster = this.turnOfPlayer;
+		this.sendPlayerInfoToPlayers();
+		TicServer.printDebug("Turn of player: " + this.turnOfPlayer);
+		for (TicPlayer p : players) {
+			if (p.getId() == this.turnOfPlayer) {
+				this.startTurnOf(p.client);
+			}
+		}
 	}
-
+	
 	public void handleMove(JSONObject moveData, TicClient client) {
-		String card = moveData.getString("card");
+		String card = moveData.getString("type");
 		// UNDO AFTER GAMEPLAY IS DONE
 //		if (moveData.getBoolean("startTurn")) {
 //			TicServer.printDebug("LOOOOOOOOOOG");
@@ -148,6 +199,10 @@ public class TicGame {
 			break;
 		case "undo":
 			result = this.handleUndoMove(moveData);
+			break;
+		case "throwaway":
+			result = true;
+			break;
 		}
 		JSONObject responseData = new JSONObject();
 		responseData.put("action", "move_response");
@@ -155,7 +210,11 @@ public class TicGame {
 		responseData.put("result", result);
 		client.socket.send(responseData.toString());
 		if (result) {
+			client.player.removeCard(Integer.parseInt(moveData.getString("card_value")));
 			this.sendBoardStateToPlayers();
+			this.turnOfPlayer++;
+			this.turnOfPlayer %= 4;
+			this.startTurnOf(this.turnOfPlayer);
 		}
 
 	}
@@ -176,10 +235,10 @@ public class TicGame {
 	private boolean handleStarterMove(JSONObject moveData) {
 		TicPlayer player = this.getPlayerByUserId(moveData.getString("user_id"));
 		return this.board.addNewMarbleToPlay(player);
-//		TESTING
+////		TESTING
 //		for (TicPlayer p : players) {
 //			board.addNewMarbleToPlay(p);
-//
+//			board.getHomeArea(p.getId()).fields[0].place(p.marbles[1]);
 //		}return true;
 	}
 
@@ -211,12 +270,67 @@ public class TicGame {
 //		if (result) this.history.remove(this.turn);
 		return true;
 	}
+	
 
+	private void startTurnOf(int playerId) {
+		for(TicPlayer p : players) {
+			if(p.getId() == playerId) {
+				this.startTurnOf(p.client);
+				return;
+			}
+		}
+	}
+
+	
+	private void startTurnOf(TicClient client) {
+		JSONObject data = new JSONObject();
+		data.put("action", "start_turn");
+		client.socket.send(data.toString());
+	}
+
+	
 	public void sendBoardStateToClient(TicClient client) {
 		JSONObject data = this.getBoardState();
 		data.put("action", "update_board");
 //		TicServer.printDebug("Message to Client:" + data.toString());
 		client.socket.send(data.toString());
+	}
+
+	private void sendCardsToClient(TicClient client) {
+		TicPlayer player = client.player;
+		JSONObject data = new JSONObject();
+		JSONArray cards = new JSONArray();
+		data.put("action", "deal");
+		for (int i = 0; i < player.cards.size(); i++) {
+			JSONObject jsonCard = new JSONObject();
+			TicCard ticCard = player.cards.get(i);
+			jsonCard.put("type", ticCard.type);
+			jsonCard.put("value", ticCard.value);
+			cards.put(jsonCard);
+		}
+		data.put("cards", cards);
+		player.client.socket.send(data.toString());
+	}
+
+	public void sendPlayerInfoToClient(TicClient client) {
+		JSONObject data = new JSONObject();
+		data.put("action", "player_info");
+		JSONArray jsonPlayers = new JSONArray();
+		for (TicPlayer p : players) {
+			JSONObject player = new JSONObject();
+			player.put("id", p.getId());
+			player.put("username", p.client.username);
+			jsonPlayers.put(player);
+		}
+		data.put("players", jsonPlayers);
+		client.socket.send(data.toString());
+
+	}
+
+	private void sendPlayerInfoToPlayers() {
+		for (TicPlayer p : players) {
+			this.sendPlayerInfoToClient(p.client);
+		}
 	}
 
 	private void sendBoardStateToPlayers() {
@@ -327,14 +441,12 @@ public class TicGame {
 		for (TicField f : board.getPlayingArea().fields) {
 			marblesInPlayingArea += f.hasOccupant() ? 1 : 0;
 		}
-		
-		TicServer.printDebug(marbleInPlay + ":"  + marbleInPlayingArea + ":" + marbleInStartArea + ":" + marblesInPlayingArea);
-		
+
 		JSONObject cardData = new JSONObject();
 		JSONArray responsCards = new JSONArray();
 		cardData.put("action", "playability");
 		cardData.put("cards", responsCards);
-		
+
 		for (int i = 0; i < cards.length(); i++) {
 			boolean playable = false;
 			int value;
@@ -360,10 +472,7 @@ public class TicGame {
 			case "swap":
 				playable = marbleInPlayingArea && marblesInPlayingArea > 1;
 				break;
-			case "throwaway":
-				break;
 			}
-			TicServer.printDebug(type + ":" + playable);
 			JSONObject card = new JSONObject();
 			card.put("id", cards.getJSONObject(i).getString("id"));
 			card.put("playable", playable);

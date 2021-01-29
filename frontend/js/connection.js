@@ -24,14 +24,13 @@ function connectToServer(conn) {
   conn.sendJSON = function(json){
     var strData = JSON.stringify(json);
     connection.send(strData);
-    // console.log("CLIENT: " + strData);
+    console.log("CLIENT: " + strData);
   }
 
   conn.sendChatMessage = function(msg){
     var data = {
       action: "msg_global",
       msg: {
-        username: client_username,
         user_id: user_id,
         room_code: room_code,
         text: msg
@@ -44,6 +43,7 @@ function connectToServer(conn) {
     //INIT CONNECTION
     var data = {
       action: "init",
+      username: client_username,
       user_id: user_id,
       room_code: room_code
     };
@@ -59,19 +59,18 @@ function connectToServer(conn) {
   conn.onmessage = function (e) {
     // console.log('SERVER:');
     let data = JSON.parse(e.data);
-    // console.log(data);
     switch (data.action) {
       case "update_board":
+      $('#menu').css("display", "none");
+      var resize = $('#game').css("display") == 'none';
+      $('#game').css("display", "");
       // console.log("UPDATE");
       updateBoard(data.data);
+      if(resize)updateCanvasSize();
       break;
       case 'team_select':
       if(data.type == "request"){
-        var interface = document.getElementById('teamButtons');
-        interface.innerHTML = `
-        <button type="button" name="team1" onclick="selectTeam(1)">Team 1</button>
-        <button type="button" name="team2" onclick="selectTeam(2)">Team 2</button>
-        `
+        $('#menu').css("display", "");
       } else if(data.type == "response"){
         if(data.response == "true"){
           //YAAAAY
@@ -80,33 +79,59 @@ function connectToServer(conn) {
         }
       }
       break;
+      case "start_turn":
+      checkPlayability();
+      enableCards();
+      console.log("START TURN");
+      break;
+      case 'player_info':
+      data.players.forEach((player) => {
+        startAreas.forEach((h) => {
+          if(h.id.split("_")[1] == player.id){
+            h.owner = player.username;
+            if(player.username == client_username)player_id = player.id;
+          }
+        });
+      });
+
+      case 'team_update':
+      $(".team_members").html("");
+      data.players.forEach((p) => {
+        var team = parseInt(p.team) + 1;
+        $("#" + team + "_team_members").append(`<span class="team_member">${p.username}<span><br>`)
+      });
+
+      break;
       case 'move_response':
       if(data.result){
         $("#" + data.card_id + "_card").addClass("tic_disabled");
+        $(".tic_card").removeClass("tic_unplayable");
+      } else {
+        enableCards();
       }
       state.busy = false;
       break;
       case 'playability':
       console.log(data);
+      var throwaway = true;
       data.cards.forEach((c) => {
         var card = $("#" + c.id + "_card");
-        var throwaway = true;
         if(c.playable){
           throwaway = false;
           card.removeClass("tic_unplayable");
         } else {
           card.addClass("tic_unplayable");
         }
-        if(throwaway){
-          disableCards();
-          enableThrowaway();
-        }
       });
+      if(throwaway){
+        disableCards();
+        enableThrowaway();
+      }
       break;
       case 'deal':{
         data.cards.forEach((c) => {
           console.log(c);
-          //addCard(c);
+          addCard(c);
         });
 
       }
@@ -123,8 +148,8 @@ function selectTeam(team) {
     team_id: team-1
   };
   connection.sendJSON(data);
-
-  var interface = document.getElementById('teamButtons');
-  interface.innerHTML = "";
-
 }
+
+$(".team_btn").on("click", function(){
+  selectTeam(parseInt($(this).prop("id").split()[0]));
+});

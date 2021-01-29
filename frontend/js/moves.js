@@ -45,9 +45,17 @@ function checkPlayability() {
   connection.sendJSON(data);
 }
 
+
 function enableThrowaway(){
-  $(".tic_card.tic_enter").on("click", function(e){
-    onDoubleClick(this, buildMove({move:"throwaway",id:id}));
+  enableHover();
+  $(".tic_card").each(function(){
+    $(this).addClass("tic_throwable");
+  });
+  $(".tic_card").on("click", function(e){
+    $(this).addClass("tic_throwable");
+    var id = $(this).prop("id").split("_")[0];
+    var cardValue = $("#" + id + "_value").html();
+    onDoubleClick(this, buildMove({move:"throwaway",id:id, value: cardValue}));
     if(!state.busy){
       console.log("SELECT");
       $(this).addClass("tic_selected");
@@ -56,17 +64,23 @@ function enableThrowaway(){
   });
 }
 
+function disableThrowaway(){
+  disableCards();
+  $(".tic_card").each(function(){
+    $(this).removeClass("tic_throwable");
+  });
+}
+
 function enableCards() {
+  enableHover();
 
   //Enter Card
   $(".tic_card.tic_enter").on("click", function(e){
     if($(this).hasClass("tic_unplayable"))return;
     var id = $(this).prop("id").split("_")[0];
-    var value = $("#" + id + "_value").html();
-    onMarbleClick(this, {type: "number", id:id, value:value});
+    onMarbleClick(this, {type: "number", id:id});
     onDoubleClick(this, buildMove({move:"enter",id:id}));
     if(!state.busy){
-      console.log("SELECT");
       $(this).addClass("tic_selected");
       state.busy = true;
     }
@@ -77,8 +91,7 @@ function enableCards() {
   $(".tic_card.tic_number").on("click", function(e){
     if($(this).hasClass("tic_unplayable"))return;
     var id = $(this).prop("id").split("_")[0];
-    var value = $("#" + id + "_value").html();
-    onMarbleClick(this, {type: "number", id:id, value:value});
+    onMarbleClick(this, {type: "number", id:id});
     if(!state.busy){
       $(this).addClass("tic_selected");
       state.busy = true;
@@ -104,6 +117,7 @@ function enableCards() {
     $(this).addClass("tic_selected");
     //get value
     var id = $(this).prop("id").split("_")[0];
+    var cardValue = $("#" + id + "_value").html();
     //move by
     state.busy = true;
     var card = this;
@@ -121,6 +135,8 @@ function enableCards() {
           {area: marbles[0].pos.area, pos: marbles[0].pos.id},
           {area: marbles[1].pos.area, pos: marbles[1].pos.id}
         ]
+        disableCards()
+        move.moveData.card_value = cardValue;
         connection.sendJSON(move);
         Field.eventTarget.removeEventListener("click", eventFunction);
       }
@@ -134,7 +150,9 @@ function enableCards() {
     if($(this).hasClass("tic_unplayable"))return;
     if($(this).hasClass("tic_disabled") || state.busy)return;
     var id = $(this).prop("id").split("_")[0];
+    var cardValue = $("#" + id + "_value").html();
     var card = this;
+    console.log("SELECT");
     $(card).addClass("tic_selected");
 
     state.busy = true; //lock other cards
@@ -146,11 +164,11 @@ function enableCards() {
       lock = true;
 
       //calculate the amount of dots that have been selected
-      var dot = parseInt(e.currentTarget.id.split("_")[2]);
+      var dotId = parseInt(e.currentTarget.id.split("_")[2]);
       var value = 0;
 
       var repeat = false;
-      for(let i = dot; i > 0; i--){
+      for(let i = dotId; i > 0; i--){
         var dot = $("#" + id +"_btn_" + i);
         if($(dot).hasClass("tic_used")){
           repeat = true;
@@ -205,9 +223,11 @@ function enableCards() {
         move.moveData.value = value;
         move.moveData.done = false;
         move.moveData.startTurn = !repeat;
-        if(!dot == 7){//turn ends after all 7 dots have been used
+        if(dotId != 7){//turn ends after all 7 dots have been used
           move.moveData.endTurn = false;
         }
+        disableCards()
+        move.moveData.card_value = cardValue;
         connection.sendJSON(move);
         lock = false;//remove lock
         Field.eventTarget.removeEventListener("click", eventFunction);
@@ -221,9 +241,10 @@ function enableCards() {
     if($(this).hasClass("tic_unplayable"))return;
     var id = $(this).prop("id").split("_")[0];
     var value = $("#" + id + "_value").html();
-    onMarbleClick(this, {type: "number", id:id, value:value});
+    onMarbleClick(this, {type: "number", id:id});
     onDoubleClick(this, buildMove({move:"skip",id:id}));
     if(!state.busy){
+      console.log("SELECT");
       $(this).addClass("tic_selected");
       state.busy = true;
     }
@@ -233,7 +254,8 @@ function enableCards() {
   $(".tic_card.tic_undo").on("click", function(e){
     if($(this).hasClass("tic_unplayable"))return;
     var id = $(sender).prop("id").split("_");
-    var move = buildMove({move:move, id:id});
+    var cardValue = $("#" + id + "_value").html();
+    var move = buildMove({move:move, id:id, value:cardValue});
     move.moveData.endTurn = false;
     onDoubleClick(this, move);
   });
@@ -247,14 +269,36 @@ function buildMove(card){
     moveData: {
       endTurn: true,
       startTurn: true,
-      card: card.move,
+      type: card.move,
+      card_value: card.value,
       card_id: card.id
     }
   }
 }
 
 function disableCards() {
+  disableHover();
   $(".tic_card").prop("onclick", null).off("click");
+  $(".tic_card").removeClass("tic_hovered");
+  // $(".tic_card").removeClass("tic_unplayable");
+}
+
+function enableHover() {
+  $(".tic_card").mouseenter(function(){
+    if(!$(this).hasClass("tic_unplayable") || $(this).hasClass("tic_throwable")){
+      $(this).addClass("tic_hovered")
+    }
+  })
+
+  $(".tic_card").mouseleave(function(){
+    $(this).removeClass("tic_hovered")
+  })
+}
+
+function disableHover() {
+  $(".tic_card").prop("onmouseenter", null).off("mouseenter");
+  $(".tic_card").prop("onmouseleave", null).off("mouseleave");
+
 }
 
 function onDoubleClick(sender, move){
@@ -262,6 +306,10 @@ function onDoubleClick(sender, move){
     if($(sender).hasClass("tic_disabled") || state.busy)return;
   } else {
     Field.removeEventListeners();
+    disableCards()
+    var id = $(sender).prop("id").split("_")[0];
+    var cardValue = $("#" + id + "_value").html();
+    move.moveData.card_value = cardValue;
     connection.sendJSON(move);
     return;
   }
@@ -269,7 +317,8 @@ function onDoubleClick(sender, move){
 
 function onMarbleClick(sender, data) {
   if($(sender).hasClass("tic_disabled") || state.busy)return;
-  var card = this;
+  var id = $(sender).prop("id").split("_")[0];
+  var cardValue = $("#" + id + "_value").html();
   var eventFunction = function(e){
     var marble = e.data.marble;
     if(marble.user_id != user_id)return;
@@ -287,7 +336,9 @@ function onMarbleClick(sender, data) {
       default:
 
     }
+    move.card_value = cardValue;
     Field.eventTarget.removeEventListener("click", eventFunction);
+    disableCards()
     connection.sendJSON(move);
   }
   Field.eventTarget.addEventListener("click", eventFunction);

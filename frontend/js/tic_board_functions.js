@@ -17,26 +17,26 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 function createhomeAreas(arr) {
   let positions = [
-    {x:width*0.75,y:height*0.5},
-    {x:width*0.5, y:height*0.75},
-    {x:width*0.25,y:height*0.5},
-    {x:width*0.5, y:height*0.25},
+    {x:0, y:height*0.25},
+    {x:-width*0.25,y:0},
+    {x:0, y:-height*0.25},
+    {x:width*0.25,y:0},
   ]
   for(let i = 0; i < 4; i++){
     let home = new Area("homeArea_" + i);
     let x = positions[i].x;
     let y = positions[i].y;
-    createFieldsArc(x, y, width*0.075, 4, home.fields, 240, 90*(i+1));
+    createFieldsArc(x, y, width*0.075, 4, home.fields, 240, 90*(i+2));
     arr.push(home);
   }
 }
 
 function createstartAreas(arr){
   let positions = [
-    {x:width*0.9,y:height*0.1},
-    {x:width*0.9, y:height*0.9},
-    {x:width*0.1,y:height*0.9},
-    {x:width*0.1, y:height*0.1},
+    {x:width*0.4, y:height*0.4},
+    {x:-width*0.4,y:height*0.4},
+    {x:-width*0.4, y:-height*0.4},
+    {x:width*0.4,y:-height*0.4},
   ]
   for(let i = 0; i < 4; i++){
     let start = new Area("startArea_" + i);
@@ -134,7 +134,7 @@ function resetFields(){
 }
 
 function calc_canvas_size(){
-  return $("#board_col").width();
+  return $("#board_col").width() * 0.75;
 }
 
 // Field.eventTarget.addEventListener("hover", function(e) {
@@ -148,7 +148,7 @@ function updateCanvasSize(){
   Field.radius = width * 0.038;
 
   let newArea = new Area(playingArea.id);
-  createFieldsArc(width*0.5, height*0.5, width*0.415, 60, newArea.fields);
+  createFieldsArc(0, 0, width*0.415, 60, newArea.fields, 360, 90);
 
   newArea.fields.forEach((f, i) => {
     playingArea.fields[i].pos = f.pos;

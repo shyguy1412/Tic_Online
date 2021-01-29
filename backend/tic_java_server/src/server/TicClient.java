@@ -9,4 +9,5 @@ public class TicClient{
 	public WebSocket socket;
 	public String userID;
 	public String roomCode;
+	public String username;
 }

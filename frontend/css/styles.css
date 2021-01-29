@@ -29,6 +29,35 @@ body{
   font-family: 'Rajdhani', sans-serif;
 }
 
+.team_headline{
+  margin-top: 0px;
+}
+
+.team_btn{
+  font-size: 2.5vh;
+}
+.team_member{
+  font-size: 1.9vh;
+}
+
+.team_members{
+  height: 12.5vh;
+}
+
+.tic_team_select{
+  margin-top: 20vh;
+  margin-bottom: auto;
+  margin-left: 1.5vh;
+  margin-right: 1.5vh;
+  padding: 2vh;
+  height: 25vh;
+  background-color: white;
+  border-radius: 3vh;
+  font-family: 'Rajdhani', sans-serif;
+  position: relative;
+  text-align: center;
+}
+
 /* input {
 padding: 20px 20px;
 }

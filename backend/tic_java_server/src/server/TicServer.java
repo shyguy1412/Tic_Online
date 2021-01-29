@@ -25,11 +25,9 @@ import java.util.Set;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import game.TicGame;
-import game.board.TicPlayingBoard;
 
 /**
  * 
@@ -68,7 +66,7 @@ public class TicServer extends WebSocketServer {
 	public void onMessage(WebSocket conn, String message) {
 		JSONObject data = new JSONObject(message);
 		TicClient client = conns.getClientFromConnection(conn);
-
+		TicServer.printDebug("Message from client: " + message);
 		switch (data.getString("action")) {
 		case "init":
 			this.initClient(client, data);
@@ -129,6 +127,7 @@ public class TicServer extends WebSocketServer {
 	private void initClient(TicClient client, JSONObject data) {
 		client.userID = data.getString("user_id");
 		client.roomCode = data.getString("room_code");
+		client.username = data.getString("username");
 		boolean found = false;
 		for (TicGame g : games) {
 			if (g.getRoomCode().equals(client.roomCode)) {
@@ -149,14 +148,14 @@ public class TicServer extends WebSocketServer {
 		if (!found) {
 			TicGame game = new TicGame(client.roomCode);
 			games.add(game);
-			addDummyPlayers(game, client); // FOR TESTING
+//			addDummyPlayers(game, client); // FOR TESTING
 			if (!game.addPlayer(client)) {
 				TicServer.printDebug("ERROR CREATING GAME: " + client.roomCode);
 			} else {
-//				this.sendTeamSelect(client);
+				this.sendTeamSelect(client);
 			}
-			game.selectTeam(client, 1); // FOR TESTING			
-			return; // FOR TESTING
+//			game.selectTeam(client, 1); // FOR TESTING			
+//			return; // FOR TESTING
 		}
 
 	}
@@ -165,8 +164,8 @@ public class TicServer extends WebSocketServer {
 		JSONObject responseData = new JSONObject();
 		responseData.put("action", "team_select");
 		responseData.put("type", "request");
-		TicServer.printDebug("Message to client: " + responseData.toString());
-		client.socket.send(responseData.toString());		
+		client.socket.send(responseData.toString());
+		client.player.game.sendTeamData(client);
 	}
 
 	private void validateRoomCode(TicClient client, JSONObject data) {
@@ -182,6 +181,7 @@ public class TicServer extends WebSocketServer {
 		client.socket.send(responseData.toString());
 	}
 
+	@SuppressWarnings("unused")
 	private void addDummyPlayers(TicGame game, TicClient client) {
 		for (int i = 0; i < 3; i++) {
 			TicClient dummy = new TicClient();

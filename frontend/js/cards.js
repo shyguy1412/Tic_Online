@@ -15,42 +15,49 @@ var split_card_html = `
 <span class="tic_split_dot $_tic_split_btn" id="$_btn_3"></span>
 <span class="tic_split_dot $_tic_split_btn" id="$_btn_7"></span>
 </div>
+<span id="$_value" style="display:none">&</span>
 </div>
 `;
 
 var number_card_html = `
 <div class="tic_card tic_number tic_center_align" id="$_card">
-<span class="tic_number tic_value" id="$_value">&</span>
+<span class="tic_number tic_value">&</span>
+<span id="$_value" style="display:none">&</span>
 </div>
 `;
 
 var backwards_card_html = `
 <div class="tic_card tic_backwards tic_center_align tic_special" id="$_card">
-<span class="tic_backwards tic_value" id="$_value">-4</span>
+<span class="tic_backwards tic_value">-4</span>
+<span id="$_value" style="display:none">&</span>
 </div>
 `;
 
 var skip_card_html = `
 <div class="tic_card tic_skip tic_center_align tic_special" id="$_card">
-<span class="tic_skip tic_value" id="$_value">8</span>
+<span class="tic_skip tic_value">8</span>
+<span id="$_value" style="display:none">&</span>
 </div>
 `;
 
 var enter_card_html = `
 <div class="tic_card tic_enter tic_center_align tic_special" id="$_card">
-<span class="tic_enter tic_value" id="$_value">&</span>
+<span class="tic_enter tic_value">&</span>
+<span id="$_value" style="display:none">&</span>
 </div>
 `
 
 var undo_card_html = `
 <div class="tic_card tic_undo tic_center_align" id="$_card">
-<span class="tic_undo tic_value" id="$_value">UNDO</span>
+<span class="tic_undo tic_value">UNDO</span>
+<span id="$_value" style="display:none">&</span>
 </div>
 `;
 
 var swap_card_html = `
 <div class="tic_card tic_swap tic_center_align" id="$_card">
-<span class="tic_swap tic_value" id="$_value">SWAP</span>
+<span class="tic_swap tic_value">SWAP</span>
+<span id="$_value" style="display:none">&</span>
 </div>
 `;
 
@@ -61,14 +68,14 @@ var hand_cards = [
   swap_card_html,
   skip_card_html,
   backwards_card_html,
-  // enter_card_html.replaceAll("&", "13"),
+  enter_card_html.replaceAll("&", "13"),
   number_card_html.replaceAll("&", "1"),
   number_card_html.replaceAll("&", "5")
 ]
 
-hand_cards.forEach((item, i) => {
-    $("#hand_cards").append(item.replaceAll("$", i));
-});
+// hand_cards.forEach((item, i) => {
+//     $("#hand_cards").append(item.replaceAll("$", i));
+// });
 
 function addCard(card) {
   var html;
@@ -95,15 +102,6 @@ function addCard(card) {
     html = backwards_card_html;
     break;
   }
-  $("#hand_cards").append(html.replaceAll("$", $('.yourclass').length).replaceAll("&", card.value));
+  console.log(card);
+  $("#hand_cards").append(html.replaceAll("$", $('.tic_card').length).replaceAll("&", card.value));
 }
-
-$(".tic_card").mouseenter(function(){
-  if(!$(this).hasClass("tic_unplayable")){
-    $(this).addClass("tic_hovered")
-  }
-})
-
-$(".tic_card").mouseleave(function(){
-  $(this).removeClass("tic_hovered")
-})

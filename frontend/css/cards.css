@@ -42,13 +42,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 /*SPLIT CARD*/
 .tic_split_dot {
   background-color: lightgray;
-  border-radius: 50%;
+  border-radius: 100%;
   width: 3vh;
   height: 3vh;
   text-align: center;
   border-color: black;
   border-style: solid;
-  border-width: 2px;
+  border-width: .3vh;
 }
 
 .tic_split{

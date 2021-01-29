@@ -33,25 +33,25 @@ public class TicDeck {
 	};
 	
 	static public final String[] STD_DECK_TYPES = {
-			"enter", 	 //1
-			"number", 	 //2
-			"number", 	 //3
-			"backwards", //4
-			"number",	 //5
-			"number",	 //6
-			"split",	 //7
-			"skip",		 //8
-			"number",	 //9
-			"number",	 //10 
-			"number",	 //11 
-			"number",	 //12
-			"enter",	 //13
-			"swap",		 
-			"undo",
-			"mindcontrol",
-			"first_aid", 
-			"dash_attack",
-			"card_cycle"  
+			"enter", 	 	//1
+			"number", 	 	//2
+			"number", 	 	//3
+			"backwards", 	//4
+			"number",	 	//5
+			"number",	 	//6
+			"split",	 	//7
+			"skip",		 	//8
+			"number",	 	//9
+			"number",	 	//10 
+			"number",	 	//11 
+			"number",	 	//12
+			"enter",	 	//13
+			"swap",		 	//14
+			"undo",		 	//15
+			"mindcontrol",	//16
+			"first_aid", 	//17
+			"dash_attack",	//18
+			"card_cycle"  	//19
 	};
 
 	private ArrayList<TicCard> stack;
@@ -71,6 +71,7 @@ public class TicDeck {
 	
 	public void shuffle() {
 		Collections.shuffle(stack);
+
 	}
 	
 	public void dealToPlayer(TicPlayer player, int amount) {
@@ -83,6 +84,7 @@ public class TicDeck {
 			jsonCard.put("type", ticCard.type);
 			jsonCard.put("value", ticCard.value);
 			cards.put(jsonCard);
+			player.cards.add(ticCard);
 			stack.remove(0);
 		}
 		data.put("cards", cards);

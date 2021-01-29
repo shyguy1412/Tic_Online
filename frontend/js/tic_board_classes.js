@@ -35,7 +35,7 @@ var Field = {
 
 Field.setDrawOptions = function(){
   stroke(0);
-  strokeWeight(1);
+  strokeWeight(width*0.0035);
   fill(150, 150, 150, 60);
 }
 
@@ -65,8 +65,27 @@ Field.removeEventListeners = function(){
 }
 
 Field.checkCollision = function(fields, event){
-  let x = mouseX;
-  let y = mouseY;
+
+  var s = sin(-board_rotation);
+  var c = cos(-board_rotation);
+  var pivotX = width*0.5;
+  var pivotY = height*0.5;
+  var x = mouseX;
+  var y = mouseY;
+
+  // translate point back to origin:
+  x -= pivotX;
+  y -= pivotY;
+
+  // rotate point
+  var xnew = x * c - y * s;
+  var ynew = x * s + y * c;
+
+  x = xnew;
+  y = ynew;
+
+
+  // console.log(zx, zy);
   fields.forEach((field) => {
     if(field.occupant != null && dist(x, y, field.pos.x, field.pos.y) < this.radius/2){
       field.hovered = true;
@@ -108,6 +127,7 @@ Field.render = function(fields){
 function Area(id){
   this.id = id;
   this.fields = [];
+  this.owner = "";
 }
 
 Area.prototype.place = function (marble){

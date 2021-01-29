@@ -2,7 +2,6 @@ package game.board;
 
 import game.player.TicMarble;
 import game.player.TicPlayer;
-import server.TicServer;
 
 public class TicPlayingBoard {
 
@@ -14,19 +13,22 @@ public class TicPlayingBoard {
 		playingArea = new TicArea(TicArea.PLAYING_AREA, 60);
 		homeAreas = new TicArea[4];
 		startAreas = new TicArea[4];
-
-	}
-
-	public int addPlayer(TicPlayer player) {
 		for (int i = 0; i < 4; i++) {
-			if (homeAreas[i] == null && startAreas[i] == null) {
-				homeAreas[i] = new TicArea(TicArea.HOME_AREA + "_" + i, 4);
-				startAreas[i] = new TicArea(TicArea.START_AREA + "_" + i, 4);
-				return i;
-			}
+			homeAreas[i] = new TicArea(TicArea.HOME_AREA + "_" + i, 4);
+			startAreas[i] = new TicArea(TicArea.START_AREA + "_" + i, 4);
 		}
-		return -1;
 	}
+
+//	public int addPlayer(TicPlayer player) {
+//		for (int i = 0; i < 4; i++) {
+//			if (homeAreas[i] == null && startAreas[i] == null) {
+//				homeAreas[i] = new TicArea(TicArea.HOME_AREA + "_" + i, 4);
+//				startAreas[i] = new TicArea(TicArea.START_AREA + "_" + i, 4);
+//				return i;
+//			}
+//		}
+//		return -1;
+//	}
 
 	public boolean addNewMarbleToPlay(TicPlayer player) {
 		for (TicMarble m : player.marbles) {
@@ -90,14 +92,14 @@ public class TicPlayingBoard {
 		}
 		return result;
 	}
-	
+
 	public boolean canMoveAMarble(TicMarble[] marbles, int amount) {
-		for(TicMarble m : marbles) {
-			if(m.area.contains(TicArea.START_AREA))continue;
+		for (TicMarble m : marbles) {
+			if (m.area.contains(TicArea.START_AREA)) continue;
 			boolean canMoveIntoHome = this.canMoveIntoHome(m, amount);
 			boolean canMove = this.canMoveMarbleBy(m, amount);
 			boolean canMoveInHome = this.canMoveMarbleInHome(m, amount);
-			if(canMove || canMoveIntoHome || canMoveInHome)return true;
+			if (canMove || canMoveIntoHome || canMoveInHome) return true;
 		}
 		return false;
 	}
@@ -123,8 +125,8 @@ public class TicPlayingBoard {
 	}
 
 	public boolean moveIntoHome(TicMarble marble, int amount) {
-		if(this.canMoveIntoHome(marble, amount)) {
-			int index = Math.abs(amount) - this.distanceFromHome(marble, amount>0) - 1;
+		if (this.canMoveIntoHome(marble, amount)) {
+			int index = Math.abs(amount) - this.distanceFromHome(marble, amount > 0) - 1;
 			this.getHomeArea(marble.owner.getId()).fields[index].place(marble);
 			return true;
 		}
@@ -161,8 +163,8 @@ public class TicPlayingBoard {
 		boolean canMove = true;
 		if (Math.abs(amount) > 1) canMove = checkForMarblesBetween(marble.pos, amount);
 		return canMove;
-	}	
-	
+	}
+
 	public boolean canMoveIntoHome(TicMarble marble, int amount) {
 		if (!marble.hasMoved) return false;// can only enter home if has moved before
 
@@ -171,12 +173,12 @@ public class TicPlayingBoard {
 		if (distFromHome > Math.abs(amount)) {
 			return false;
 		}
-		
+
 		if (marble.pos == marble.owner.entryPoint) {
-			return this.marbleInHomeBetween(0, Math.abs(amount)-1, this.getHomeArea(marble.owner.getId()));
+			return this.marbleInHomeBetween(0, Math.abs(amount) - 1, this.getHomeArea(marble.owner.getId()));
 		} else {
 			int remainingSteps = Math.abs(amount) - distFromHome;
-			return this.marbleInHomeBetween(0, remainingSteps-1, this.getHomeArea(marble.owner.getId()));
+			return this.marbleInHomeBetween(0, remainingSteps - 1, this.getHomeArea(marble.owner.getId()));
 
 		}
 	}

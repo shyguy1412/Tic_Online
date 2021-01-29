@@ -70,71 +70,71 @@ if(!(isset($_SESSION['user_id']) && isset($_SESSION['username'])) && isset($_GET
         </div>
       </div>
 
-      <!-- <div class="row">
-        <div id="debug_options">
-          <button type="button" onclick="enterMarble()" name="enter">Enter</button>
-          <button type="button" onclick="moveMarbleBy(document.getElementById('num_in').value)" name="move">Move</button><input id="num_in" type="number" name="num" value="5">
-          <br><br>
-          <button type="button" onclick="swapMarbles()" name="swap">Swap</button>
-          <button type="button" onclick="" name="enter">Skip</button>
-          <button type="button" onclick="" name="enter">Split</button>
-          <button type="button" onclick="" name="enter">Undo</button>
-          <button type="button" onclick="" name="enter">Mind Control</button>
-          <button type="button" onclick="" name="enter">First Aid</button>
-          <button type="button" onclick="" name="enter">Dash Attack</button>
-          <button type="button" onclick="" name="enter">Hand Around</button>
-        </div>
-      </div> -->
-<!--
-      <div class="row">
-        <div class="play_choice">
-          <button type="button" onclick="connection = conn_a;" name="enter">A</button>
-          <button type="button" onclick="connection = conn_b" name="enter">B</button>
-          <button type="button" onclick="connection = conn_c" name="enter">C</button>
-          <button type="button" onclick="connection = conn_d" name="enter">D</button>
-        </div>
-      </div> -->
-
-      <div class="row">
-        <div class="col-sm-3"></div>
-        <div class="col-sm-6" id="board_col">
-          <div id="board_wrapper">
+      <div id="game" style="display:none">
+      <!-- <div id="game"> -->
+        <div class="row">
+          <div class="col-sm-3"></div>
+          <div class="col-sm-6" id="board_col">
+            <div class="d-flex justify-content-center" id="board_wrapper">
           </div>
+          </div>
+          <div class="col-sm-3"></div>
         </div>
-        <div class="col-sm-3"></div>
-      </div>
 
-      <div class="row" style="margin-top: 4vh">
-        <div class="col-sm-1"></div>
-        <div class="col-sm-10" id="board_col">
-          <div id="interface_wrapper">
-            <div class="hand row">
-              <div class="col-sm-1"></div>
-              <div class="col-sm-10">
-                <div id="teamButtons">
-
+        <div class="row" style="margin-top: 4vh">
+          <div class="col-sm-1"></div>
+          <div class="col-sm-10">
+            <div id="interface_wrapper">
+              <div class="hand row">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-10">
+                  <div class="d-flex justify-content-around" id="hand_cards">
+                  </div>
                 </div>
-                <div class="d-flex justify-content-around" id="hand_cards">
-                </div>
+                <div class="col-sm-1"></div>
               </div>
-              <div class="col-sm-1"></div>
             </div>
           </div>
+          <div class="col-sm-1"></div>
         </div>
-        <div class="col-sm-1"></div>
+      </div>
+      <div id="menu" style="display:none">
+        <div class="row">
+          <div class="col-sm-3"></div>
+          <div class="col-sm-6">
+
+            <div class="d-flex justify-content-around" id="teams">
+              <div class="tic_team_select" id="team1">
+                <h2 class="team_headline">Team 1</h2>
+                <div class="team_members" id="1_team_members">
+
+                </div>
+                <input class="btn btn-primary team_btn" type="button" id="1_team_join_btn" value="Join">
+              </div>
+              <div class="tic_team_select" id="team1">
+                <h2 class="team_headline">Team 2</h2>
+                <div class="team_members" id="2_team_members">
+
+                </div>
+                <input class="btn btn-primary team_btn" type="button" id="2_team_join_btn" value="Join">
+              </div>
+            </div>
+
+          </div>
+          <div class="col-sm-3"></div>
+        </div>
       </div>
 
-      <div class="row" style="margin-top:5vh"></div>
 
     </div>
-  </div>
-</main>
+  </main>
 </body>
 <script>
 
 var user_id = "<?php echo $_SESSION['user_id']; ?>";
 var room_code = "<?php echo $_SESSION['room_code']; ?>";
 var client_username =  "<?php echo $_SESSION['username']; ?>";
+var player_id = 0;
 if(client_username == ""|| user_id == ""){
   var input_div = document.getElementById('input_div');
   input_div.style = "";
