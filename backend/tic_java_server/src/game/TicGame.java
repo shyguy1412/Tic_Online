@@ -397,6 +397,7 @@ public class TicGame {
 			JSONObject player = new JSONObject();
 			player.put("id", p.getId());
 			player.put("user_id", p.client.userID);
+			player.put("username", p.client.username);
 			jsonPlayers.put(player);
 		}
 		data.put("players", jsonPlayers);

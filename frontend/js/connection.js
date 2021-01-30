@@ -18,8 +18,8 @@ var connection;
 
 function connectToServer(conn) {
 
-  // conn = new WebSocket('ws://localhost:8080');
-  conn = new WebSocket('wss://tic.nilsramstoeck.net/ws/');
+  conn = new WebSocket('ws://localhost:8080');
+  // conn = new WebSocket('wss://tic.nilsramstoeck.net/ws/');
 
   conn.sendJSON = function(json){
     var strData = JSON.stringify(json);
