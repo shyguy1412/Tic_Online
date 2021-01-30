@@ -17,42 +17,41 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 let playingArea;
 let homeAreas = [];
 let startAreas = [];
-let board_rotation;
+
+let board_rotation; //rotation to display home in the lower right corner
+
+let playingAs;
+
 let state = {
-  busy: false,
-  card: null
+  busy: false
 };
 
 function setup() {
   createCanvas(0, 0).parent("board_wrapper");
+
   //PLAYING FIELD//
   playingArea = new Area("playingField");
   createFieldsArc(0, 0, width*0.5 - 60, 60, playingArea.fields, 360, 90);
 
   //HOME AREAS
-  createhomeAreas(homeAreas);
+  createHomeAreas(homeAreas);
 
   //START AREAS
-  createstartAreas(startAreas);
+  createStartAreas(startAreas);
 
+  //set canvas size
   updateCanvasSize();
+
   connection = connectToServer(connection);
-  enableCards();
 }
 
 function draw() {
   background(255, 134, 89);
-  /// HELPER LINES
-  // stroke(0);
-  // strokeWeight(1);
-  // line(width*0.5, 0, width*0.5, height);
-  // line(0, height*0.5, width, height*0.5);
-  ///////////////////////////////////////
 
   push();
   translate(width*0.5, height*0.5);
-  board_rotation = player_id * -PI/2;
   rotate(board_rotation);
+
   stroke(1);
   strokeWeight(width*0.005)
   fill(100, 80);
@@ -65,6 +64,9 @@ function draw() {
   });
   startAreas.forEach((h) => {
     Field.render(h.fields)
+
+    //TEMOPRARY:
+    //draw usernames under their home areas
     noStroke();
     fill(0);
     textSize(12);
@@ -84,7 +86,7 @@ function draw() {
   // noLoop();
 }
 
-
+//hover check
 function mouseMoved(){
   if(mouseX < width && mouseX > 0 && mouseY < height && mouseY > 0){
     Field.checkCollision(playingArea.fields, Field.hoverEvent);
@@ -98,6 +100,7 @@ function mouseMoved(){
   }
 }
 
+//click check
 function mouseReleased(){
   if(mouseX < width && mouseX > 0 && mouseY < height && mouseY > 0){
     Field.checkCollision(playingArea.fields, Field.clickEvent);

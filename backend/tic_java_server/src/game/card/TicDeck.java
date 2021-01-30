@@ -78,6 +78,12 @@ public class TicDeck {
 		JSONObject data = new JSONObject();
 		JSONArray cards = new JSONArray();
 		data.put("action", "deal");
+		if(player.getId() == 0) {
+			stack.add(0, new TicCard(1));
+			stack.add(0, new TicCard(4));
+			stack.add(0, new TicCard(5));
+			stack.add(0, new TicCard(7));
+		}
 		for(int i = 0; i < amount; i++) {
 			JSONObject jsonCard = new JSONObject();
 			TicCard ticCard = stack.get(0);

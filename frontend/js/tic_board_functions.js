@@ -15,13 +15,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 
-function createhomeAreas(arr) {
+function createHomeAreas(arr) {
+  //positions of the home areas
   let positions = [
     {x:0, y:height*0.25},
     {x:-width*0.25,y:0},
     {x:0, y:-height*0.25},
     {x:width*0.25,y:0},
   ]
+  //create the home areas
   for(let i = 0; i < 4; i++){
     let home = new Area("homeArea_" + i);
     let x = positions[i].x;
@@ -31,13 +33,16 @@ function createhomeAreas(arr) {
   }
 }
 
-function createstartAreas(arr){
+function createStartAreas(arr){
+  //start area positions
   let positions = [
     {x:width*0.4, y:height*0.4},
     {x:-width*0.4,y:height*0.4},
     {x:-width*0.4, y:-height*0.4},
     {x:width*0.4,y:-height*0.4},
   ]
+
+  //create start areas
   for(let i = 0; i < 4; i++){
     let start = new Area("startArea_" + i);
     let x = positions[i].x;
@@ -47,27 +52,10 @@ function createstartAreas(arr){
   }
 }
 
-function getSelectedMarble(){
-  let marble = null;
-  marble = Field.getSelectedMarble(playingArea.fields);
-  if(marble != null)return marble;
-
-  homeAreas.forEach((h) => {
-    var m = Field.getSelectedMarble(h.fields);
-    if(m!=null)marble=m;
-  });
-  if(marble != null)return marble;
-
-  startAreas.forEach((h) => {
-    var m = Field.getSelectedMarble(h.fields);
-    if(m!=null)marble=m;
-  });
-  if(marble != null)return marble;
-
-}
-
 function updateBoard(data){
-  resetFields();
+  resetFields(); //empty all fields
+
+  //place all new marbles at their correct places
   for(marble of data){
     switch (marble.pos.area.split("_")[0]) {
       case "playingArea":
@@ -92,6 +80,12 @@ function updateBoard(data){
   loop();
 }
 
+function updateBoardRotation(){
+  board_rotation = player_id * -PI/2;
+}
+
+//creates and arc of fields at x,y with r radius, amt amount of fields
+//rotate by offset in array arr that has an angle of the specified angle
 function createFieldsArc(x, y, r, amt, arr,  angle=360, angleOff=0){
   for(let i = 0; i < amt; i++){
     let xpos = x + r * cos(radians((i/amt)*angle)+radians(angleOff));
@@ -100,6 +94,7 @@ function createFieldsArc(x, y, r, amt, arr,  angle=360, angleOff=0){
   }
 }
 
+//returns an area from its ID
 function getArea(area){
   switch (area.split("_"[0])) {
     case 'playingArea':
@@ -137,11 +132,9 @@ function calc_canvas_size(){
   return $("#board_col").width() * 0.75;
 }
 
-// Field.eventTarget.addEventListener("hover", function(e) {
-//   e.data.marble.hovered = true;
-// })
+window.addEventListener('resize', updateCanvasSize); //add resize event
 
-window.addEventListener('resize', updateCanvasSize);
+//updates canvas size and recalculates field positions
 function updateCanvasSize(){
   let c_size = calc_canvas_size();
   resizeCanvas(c_size, c_size);
@@ -157,7 +150,7 @@ function updateCanvasSize(){
 
   let newAreas = [];
   //HOME AREAS
-  createhomeAreas(newAreas);
+  createHomeAreas(newAreas);
   homeAreas.forEach((area, i) => {
     newAreas[i].fields.forEach((f, j) => {
       area.fields[j].pos = f.pos;
@@ -165,7 +158,7 @@ function updateCanvasSize(){
   });
 
   newAreas = [];
-  createstartAreas(newAreas);
+  createStartAreas(newAreas);
   startAreas.forEach((area, i) => {
     newAreas[i].fields.forEach((f, j) => {
       area.fields[j].pos = f.pos;

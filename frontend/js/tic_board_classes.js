@@ -14,7 +14,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
-
+//Field Object
 function FieldObject(id, x, y){
   this.id = id;
   this.occupant = null;
@@ -44,20 +44,6 @@ Field.clear = function(fields){
     field.occupant = null;
   });
 
-}
-
-Field.getSelectedMarble = function(fields){
-  let x = mouseX;
-  let y = mouseY;
-  // console.log(fields);
-  for(let i = 0; i < fields.length; i++){
-    if(fields[i].occupant != null){
-      if(fields[i].occupant.selected){
-        return fields[i].occupant;
-      }
-    }
-  }
-  return null;
 }
 
 Field.removeEventListeners = function(){

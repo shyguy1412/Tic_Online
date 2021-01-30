@@ -66,7 +66,7 @@ public class TicServer extends WebSocketServer {
 	public void onMessage(WebSocket conn, String message) {
 		JSONObject data = new JSONObject(message);
 		TicClient client = conns.getClientFromConnection(conn);
-		TicServer.printDebug("Message from client: " + message);
+//		TicServer.printDebug("Message from client: " + message);
 		switch (data.getString("action")) {
 		case "init":
 			this.initClient(client, data);

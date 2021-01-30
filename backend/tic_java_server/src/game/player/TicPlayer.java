@@ -67,4 +67,11 @@ public class TicPlayer {
 		}
 	}
 
+	public boolean isDone() {
+		for(TicMarble m : marbles) {
+			if(!m.done)return false;
+		}
+		return true;
+	}
+
 }

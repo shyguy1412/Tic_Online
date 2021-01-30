@@ -1,5 +1,7 @@
 package game.player;
 
+import java.util.Collection;
+
 public class TicTeam {
 	public TicPlayer[] players;
 	private int id;
@@ -44,6 +46,13 @@ public class TicTeam {
 
 	public int getId() {
 		return id;
+	}
+
+	public TicPlayer getTeammate(TicPlayer player) {
+		for(TicPlayer p : this.players) {
+			if(p != player)return p;
+		}
+		return null;
 	}
 
 

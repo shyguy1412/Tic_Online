@@ -167,7 +167,6 @@ public class TicPlayingBoard {
 
 	public boolean canMoveIntoHome(TicMarble marble, int amount) {
 		if (!marble.hasMoved) return false;// can only enter home if has moved before
-
 		int distFromHome = this.distanceFromHome(marble, amount > 0);
 
 		if (distFromHome > Math.abs(amount)) {
@@ -226,5 +225,15 @@ public class TicPlayingBoard {
 
 	public TicArea getPlayingArea() {
 		return playingArea;
+	}
+
+	public boolean checkIfDone(TicMarble m) {
+		if(!m.area.contains(TicArea.HOME_AREA))return false;
+		TicArea area = this.getHomeArea(m.owner.getId());
+		int pos = m.pos;
+		for(int i = pos; i < 4; i++) {
+			if(!area.fields[i].hasOccupant())return false;
+		}
+		return true;
 	}
 }

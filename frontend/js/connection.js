@@ -18,8 +18,8 @@ var connection;
 
 function connectToServer(conn) {
 
-  conn = new WebSocket('ws://localhost:8080');
-  // conn = new WebSocket('wss://tic.nilsramstoeck.net/ws/');
+  // conn = new WebSocket('ws://localhost:8080');
+  conn = new WebSocket('wss://tic.nilsramstoeck.net/ws/');
 
   conn.sendJSON = function(json){
     var strData = JSON.stringify(json);
@@ -59,6 +59,7 @@ function connectToServer(conn) {
   conn.onmessage = function (e) {
     // console.log('SERVER:');
     let data = JSON.parse(e.data);
+    console.log(data);
     switch (data.action) {
       case "update_board":
       $('#menu').css("display", "none");
@@ -67,6 +68,14 @@ function connectToServer(conn) {
       // console.log("UPDATE");
       updateBoard(data.data);
       if(resize)updateCanvasSize();
+      break;
+      case 'undo_response':
+      $("#" + data.card_id + "_card").replaceWith(getCardHTML(data, data.card_id));
+      $("#" + data.card_id + "_card").addClass("tic_selected");
+      enableCards();
+      state.busy = false;
+      console.log(data);
+
       break;
       case 'team_select':
       if(data.type == "request"){
@@ -89,18 +98,29 @@ function connectToServer(conn) {
         startAreas.forEach((h) => {
           if(h.id.split("_")[1] == player.id){
             h.owner = player.username;
-            if(player.username == client_username)player_id = player.id;
+            if(player.user_id == user_id){
+              playingAs = player.id;
+              player_id = player.id;
+              updateBoardRotation();
+            }
           }
         });
       });
+      break;
+      case 'controll_teammate':
+      console.log("NOW PLAYING AS:" + data.teammate);
+      playingAs = data.teammate;
       break;
       case "start_round":
       enableSwap();
       break;
       case "swap_card_response":
+      console.log(data);
       if(data.result){
         disableSwap();
+        state.busy = false;
       }
+      break;
       case 'team_update':
       $(".team_members").html("");
       data.players.forEach((p) => {
@@ -111,7 +131,7 @@ function connectToServer(conn) {
       break;
       case 'move_response':
       if(data.result){
-        $("#" + data.card_id + "_card").addClass("tic_disabled");
+        $("#" + data.card_id + "_card").remove();
         $(".tic_card").removeClass("tic_unplayable");
       } else {
         enableCards();
@@ -139,7 +159,7 @@ function connectToServer(conn) {
         $("#hand_cards").html("");
         data.cards.forEach((c) => {
           console.log(c);
-          addCard(c);
+          $("#hand_cards").append(getCardHTML(c, $('.tic_card').length));
         });
 
       }

@@ -15,16 +15,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 
-//MOVE CONDITIONS
-/*
-NUMBER: have at least 1 marble in play that can move x amount of spaces
-BACKWARDS: have at least 1 marble in the playing area that can move x spacces backwards
-SPLIT: have at least one marble in play
-SKIP: have at least 1 marble on the playing area
-UNDO: be able to play the card you steal
-ENTER: have at least 1 marble in your homearea
-SWAP: have at least 1 marble on the playing area. playing area must have at least 2 marbles
-*/
 
 function checkPlayability() {
   var data = {
@@ -56,7 +46,6 @@ function enableThrowaway(){
     var cardValue = $("#" + id + "_value").html();
     onDoubleClick(this, buildMove({move:"throwaway",id:id, value: cardValue}));
     if(!state.busy){
-      console.log("SELECT");
       $(this).addClass("tic_selected");
       state.busy = true;
     }
@@ -71,7 +60,6 @@ function disableThrowaway(){
 }
 
 function enableSwap(){
-  console.log("ENABLE SWAP");
   enableHover();
   $(".tic_card").on("click", function(e){
     var id = $(this).prop("id").split("_")[0];
@@ -91,7 +79,6 @@ function enableSwap(){
 }
 
 function disableSwap(){
-  console.log("DISABLE SWAP");
   disableCards();
 }
 
@@ -192,7 +179,7 @@ function enableCards() {
       //calculate the amount of dots that have been selected
       var dotId = parseInt(e.currentTarget.id.split("_")[2]);
       var value = 0;
-
+      console.log("DOT");
       var repeat = false;
       for(let i = dotId; i > 0; i--){
         var dot = $("#" + id +"_btn_" + i);
@@ -208,8 +195,9 @@ function enableCards() {
 
 
       var eventFunction = function(e){
+        console.log("MARBLE");
         var marble = e.data.marble;
-        if(marble.user_id != user_id)return;
+        if(marble.player_id != playingAs)return;
 
         //case: marble is in homearea
         if(marble.pos.area.includes("homeArea") && !marble.dummy){
@@ -254,6 +242,7 @@ function enableCards() {
         }
         disableCards()
         move.moveData.card_value = cardValue;
+        console.log(move);
         connection.sendJSON(move);
         lock = false;//remove lock
         Field.eventTarget.removeEventListener("click", eventFunction);
@@ -266,7 +255,6 @@ function enableCards() {
   $(".tic_card.tic_skip").on("click", function(e){
     if($(this).hasClass("tic_unplayable"))return;
     var id = $(this).prop("id").split("_")[0];
-    var value = $("#" + id + "_value").html();
     onMarbleClick(this, {type: "number", id:id});
     onDoubleClick(this, buildMove({move:"skip",id:id}));
     if(!state.busy){
@@ -279,11 +267,16 @@ function enableCards() {
 
   $(".tic_card.tic_undo").on("click", function(e){
     if($(this).hasClass("tic_unplayable"))return;
-    var id = $(sender).prop("id").split("_");
+    var id = $(this).prop("id").split("_")[0];
     var cardValue = $("#" + id + "_value").html();
-    var move = buildMove({move:move, id:id, value:cardValue});
+    var move = buildMove({move:"undo", id:id, value:cardValue});
     move.moveData.endTurn = false;
     onDoubleClick(this, move);
+    if(!state.busy){
+      console.log("SELECT");
+      $(this).addClass("tic_selected");
+      state.busy = true;
+    }
   });
 }
 
@@ -348,7 +341,7 @@ function onMarbleClick(sender, data) {
   var cardValue = $("#" + id + "_value").html();
   var eventFunction = function(e){
     var marble = e.data.marble;
-    if(marble.user_id != user_id)return;
+    if(marble.player_id != playingAs)return;
     var move;
     switch (data.type) {
       case "number":
@@ -363,10 +356,10 @@ function onMarbleClick(sender, data) {
       default:
 
     }
-    move.card_value = cardValue;
-    Field.eventTarget.removeEventListener("click", eventFunction);
+    move.moveData.card_value = cardValue;
     disableCards()
     connection.sendJSON(move);
+    Field.eventTarget.removeEventListener("click", eventFunction);
   }
   Field.eventTarget.addEventListener("click", eventFunction);
 }

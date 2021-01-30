@@ -69,15 +69,14 @@ var hand_cards = [
   skip_card_html,
   backwards_card_html,
   enter_card_html.replaceAll("&", "13"),
-  number_card_html.replaceAll("&", "1"),
   number_card_html.replaceAll("&", "5")
 ]
 
-// hand_cards.forEach((item, i) => {
-//     $("#hand_cards").append(item.replaceAll("$", i));
-// });
+hand_cards.forEach((item, i) => {
+    $("#hand_cards").append(item.replaceAll("$", i));
+});
 
-function addCard(card) {
+function getCardHTML(card, id) {
   var html;
   switch (card.type) {
     case 'enter':
@@ -103,5 +102,5 @@ function addCard(card) {
     break;
   }
   console.log(card);
-  $("#hand_cards").append(html.replaceAll("$", $('.tic_card').length).replaceAll("&", card.value));
+  return html.replaceAll("$", id).replaceAll("&", card.value);
 }
