@@ -80,6 +80,7 @@ public class TicDeck {
 		data.put("action", "deal");
 		if(player.getId() == 0) {
 			stack.add(0, new TicCard(1));
+			stack.add(0, new TicCard(1));
 			stack.add(0, new TicCard(4));
 			stack.add(0, new TicCard(5));
 			stack.add(0, new TicCard(7));

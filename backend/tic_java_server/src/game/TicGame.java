@@ -192,10 +192,14 @@ public class TicGame {
 			result = true;
 			break;
 		}
-		if(client.player.isDone()) {
-			this.controllTeammate(client);
-		} else {
-			this.controllSelf(client);
+		for (TicMarble m : client.player.marbles) {
+			m.done = this.board.checkIfDone(m);
+		}
+		if(client.player.isDone() && !moveData.getBoolean("endTurn")) {
+			JSONObject responseData = new JSONObject();
+			responseData.put("action", "move_response");
+			responseData.put("done", client.player.isDone());
+			client.socket.send(responseData.toString());
 		}
 		if (moveData.getBoolean("endTurn")) {
 			this.sendBoardStateToClient(client);
@@ -203,6 +207,7 @@ public class TicGame {
 			responseData.put("action", "move_response");
 			responseData.put("card_id", moveData.getString("card_id"));
 			responseData.put("result", result);
+			responseData.put("done", client.player.isDone());
 			client.socket.send(responseData.toString());
 			if (result) {
 				client.player.removeCard(Integer.parseInt(moveData.getString("card_value")));
@@ -211,9 +216,6 @@ public class TicGame {
 				this.startTurnOf(this.turnOfPlayer);
 			}
 			boolean roundOver = true;
-			for (TicMarble m : client.player.marbles) {
-				m.done = this.board.checkIfDone(m);
-			}
 			for (TicPlayer p : players) {
 				roundOver &= p.cards.isEmpty();
 			}
@@ -238,13 +240,21 @@ public class TicGame {
 
 	private boolean handleEnterMove(JSONObject moveData) {
 		TicPlayer player = this.getPlayerByUserId(moveData.getString("user_id"));
-		for (int i = 1; i < 4; i++) {
-			if (player.getId() == 0) {
+		if (player.getId() == 0 && !player.isDone()){
+			for (int i = 1; i < 4; i++) {
 				TicArea area = board.getHomeArea(player.getId());
 				area.fields[i].place(player.marbles[i]);
 			}
+//			return true;
 		}
-		return this.board.addNewMarbleToPlay(player);
+
+		if (!player.isDone()) {
+			return this.board.addNewMarbleToPlay(player);
+		} else {
+			TicServer.printDebug("ADDING FOR TEAMAMTE");
+			return this.board.addNewMarbleToPlay(player.team.getTeammate(player));
+		}
+
 ////		TESTING
 //		for (TicPlayer p : players) {
 //			board.addNewMarbleToPlay(p);
@@ -286,26 +296,8 @@ public class TicGame {
 		client.socket.send(undoData.toString());
 		client.player.removeCard(Integer.parseInt(moveData.getString("card_value")));
 		client.player.cards.add(cardEffect);
-		
-		for(TicPlayer p : players) {
-			if(p.isDone()) {
-				this.controllTeammate(p.client);
-			} else {
-				this.controllSelf(p.client);
-			}
-		}
-		
+
 		return true;
-	}
-
-	private void startTurnOf(int playerId) {
-
-		for (TicPlayer p : players) {
-			if (p.getId() == playerId) {
-				this.startTurnOf(p.client);
-				return;
-			}
-		}
 	}
 
 	public void swapCard(TicPlayer player, JSONObject data) {
@@ -359,9 +351,19 @@ public class TicGame {
 		}
 	}
 
+	private void startTurnOf(int playerId) {
+		for (TicPlayer p : players) {
+			if (p.getId() == playerId) {
+				this.startTurnOf(p.client);
+				return;
+			}
+		}
+	}
+
 	private void startTurnOf(TicClient client) {
 		JSONObject data = new JSONObject();
 		data.put("action", "start_turn");
+		data.put("done", client.player.isDone());
 		client.socket.send(data.toString());
 	}
 
@@ -395,30 +397,13 @@ public class TicGame {
 		JSONArray jsonPlayers = new JSONArray();
 		for (TicPlayer p : players) {
 			JSONObject player = new JSONObject();
-			player.put("id", p.getId());
+			player.put("player_id", p.getId());
+			player.put("teammate_id", p.team.getTeammate(p).getId());
 			player.put("user_id", p.client.userID);
 			player.put("username", p.client.username);
 			jsonPlayers.put(player);
 		}
 		data.put("players", jsonPlayers);
-		client.socket.send(data.toString());
-
-	}
-	
-	public void controllTeammate(TicClient client) {
-		JSONObject data = new JSONObject();
-		data.put("action", "controll_teammate");
-		TicTeam team = client.player.team;
-		data.put("teammate", team.getTeammate(client.player).getId());
-		client.socket.send(data.toString());
-
-	}
-
-	public void controllSelf(TicClient client) {
-		JSONObject data = new JSONObject();
-		data.put("action", "controll_teammate");
-		TicTeam team = client.player.team;
-		data.put("teammate", client.player.getId());
 		client.socket.send(data.toString());
 
 	}
@@ -529,7 +514,13 @@ public class TicGame {
 	}
 
 	public void checkPlayability(TicPlayer player, JSONArray cards) {
-		TicMarble[] marbles = player.marbles;
+		TicMarble[] marbles;
+		if (player.isDone()) {
+			marbles = player.team.getTeammate(player).marbles;
+		} else {
+			marbles = player.marbles;
+		}
+
 		boolean marbleInPlay = false;
 		boolean marbleInPlayingArea = false;
 		boolean marbleInStartArea = false;
@@ -557,7 +548,7 @@ public class TicGame {
 		for (int i = 0; i < cards.length(); i++) {
 			boolean playable = false;
 			int value = cards.getJSONObject(i).getInt("value");
-				String type = cards.getJSONObject(i).getString("type");
+			String type = cards.getJSONObject(i).getString("type");
 			switch (type) {
 			case "enter":
 				playable = marbleInStartArea || this.board.canMoveAMarble(marbles, value);

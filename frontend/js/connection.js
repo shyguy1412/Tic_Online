@@ -91,25 +91,25 @@ function connectToServer(conn) {
       case "start_turn":
       checkPlayability();
       enableCards();
+      if(data.done){
+        playingAs = (player_id + 2) % 4;
+      } else {
+        playingAs = player_id;
+      }
       console.log("START TURN");
       break;
       case 'player_info':
       data.players.forEach((player) => {
         startAreas.forEach((h) => {
-          if(h.id.split("_")[1] == player.id){
+          if(h.id.split("_")[1] == player.player_id){
             h.owner = player.username;
             if(player.user_id == user_id){
-              playingAs = player.id;
-              player_id = player.id;
+              player_id = player.player_id;
               updateBoardRotation();
             }
           }
         });
       });
-      break;
-      case 'controll_teammate':
-      console.log("NOW PLAYING AS:" + data.teammate);
-      playingAs = data.teammate;
       break;
       case "start_round":
       enableSwap();
@@ -135,6 +135,11 @@ function connectToServer(conn) {
         $(".tic_card").removeClass("tic_unplayable");
       } else {
         enableCards();
+      }
+      if(data.done){
+        playingAs = (player_id + 2) % 4;
+      } else {
+        playingAs = player_id;
       }
       state.busy = false;
       break;
