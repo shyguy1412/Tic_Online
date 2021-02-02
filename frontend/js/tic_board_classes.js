@@ -71,7 +71,6 @@ Field.checkCollision = function(fields, event){
   y = ynew;
 
 
-  // console.log(zx, zy);
   fields.forEach((field) => {
     if(field.occupant != null && dist(x, y, field.pos.x, field.pos.y) < this.radius/2){
       field.hovered = true;
@@ -120,8 +119,6 @@ Area.prototype.place = function (marble){
   this.fields.forEach((f) => {
     if(f.id == marble.pos.id){
       f.occupant = marble;
-      // console.log("MARBLE PLACED AT: " + this.id + ":"+ marble.pos.id)
-      // console.log(f);
     }
   });
 }

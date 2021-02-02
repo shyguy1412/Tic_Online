@@ -63,6 +63,7 @@ var swap_card_html = `
 
 
 
+/*
 var hand_cards = [
   split_card_html,
   swap_card_html,
@@ -75,6 +76,7 @@ var hand_cards = [
 hand_cards.forEach((item, i) => {
     $("#hand_cards").append(item.replaceAll("$", i));
 });
+ */
 
 function getCardHTML(card, id) {
   var html;
@@ -101,6 +103,5 @@ function getCardHTML(card, id) {
     html = backwards_card_html;
     break;
   }
-  console.log(card);
   return html.replaceAll("$", id).replaceAll("&", card.value);
 }

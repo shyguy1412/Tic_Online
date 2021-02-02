@@ -82,7 +82,6 @@ function draw() {
   });
   pop();
 
-  // console.log(mouseButton);
   // noLoop();
 }
 

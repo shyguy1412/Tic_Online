@@ -70,13 +70,12 @@ if(!(isset($_SESSION['user_id']) && isset($_SESSION['username'])) && isset($_GET
         </div>
       </div>
 
-      <div id="game" style="display:none">
-      <!-- <div id="game"> -->
+      <div id="game">
         <div class="row">
           <div class="col-sm-3"></div>
           <div class="col-sm-6" id="board_col">
             <div class="d-flex justify-content-center" id="board_wrapper">
-          </div>
+            </div>
           </div>
           <div class="col-sm-3"></div>
         </div>
@@ -98,30 +97,33 @@ if(!(isset($_SESSION['user_id']) && isset($_SESSION['username'])) && isset($_GET
           <div class="col-sm-1"></div>
         </div>
       </div>
-      <div id="menu" style="display:none">
-        <div class="row">
-          <div class="col-sm-3"></div>
-          <div class="col-sm-6">
 
-            <div class="d-flex justify-content-around" id="teams">
-              <div class="tic_team_select" id="team1">
-                <h2 class="team_headline">Team 1</h2>
-                <div class="team_members" id="1_team_members">
 
+      <div id="menu-modal" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="false">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="container-fluid" style="background-color: transparent !important;" id="menu">
+            <div class="row" id="teams">
+
+              <div class="col">
+                <div class="card team-card modal-content unselected" style="border-radius: 20px" id="1_team">
+                  <div class="tic_team_select card-body" id="team1">
+                    <h2 class="team_headline">Team 1</h2>
+                    <div class="team_members" id="1_team_members"></div>
+                  </div>
                 </div>
-                <input class="btn btn-primary team_btn" type="button" id="1_team_join_btn" value="Join">
               </div>
-              <div class="tic_team_select" id="team1">
-                <h2 class="team_headline">Team 2</h2>
-                <div class="team_members" id="2_team_members">
 
+              <div class="col">
+                <div class="card team-card modal-content unselected" style="border-radius: 20px" id="2_team">
+                  <div class="tic_team_select card-body" id="team2">
+                    <h2 class="team_headline">Team 2</h2>
+                    <div class="team_members" id="2_team_members"></div>
+                  </div>
                 </div>
-                <input class="btn btn-primary team_btn" type="button" id="2_team_join_btn" value="Join">
               </div>
+
             </div>
-
           </div>
-          <div class="col-sm-3"></div>
         </div>
       </div>
 
@@ -130,6 +132,22 @@ if(!(isset($_SESSION['user_id']) && isset($_SESSION['username'])) && isset($_GET
   </main>
 </body>
 <script>
+
+$('#menu-modal').modal({
+  backdrop: false,
+  keyboard: false,
+  show: true
+});
+
+$('.team-card').on("mouseenter", function() {
+  $(this).css("color", "Black");
+});
+
+$('.team-card').on("mouseleave", function() {
+  if ($(this).hasClass("unselected")){
+    $(this).css("color", "Silver");
+  }
+});
 
 var user_id = "<?php echo $_SESSION['user_id']; ?>";
 var room_code = "<?php echo $_SESSION['room_code']; ?>";

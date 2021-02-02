@@ -57,29 +57,25 @@ function connectToServer(conn) {
 
   // Log messages from the server
   conn.onmessage = function (e) {
-    // console.log('SERVER:');
     let data = JSON.parse(e.data);
     console.log(data);
     switch (data.action) {
+      case "start_game":
+      $("#menu-modal").modal("hide");
+      break;
       case "update_board":
-      $('#menu').css("display", "none");
-      var resize = $('#game').css("display") == 'none';
-      $('#game').css("display", "");
-      // console.log("UPDATE");
       updateBoard(data.data);
-      if(resize)updateCanvasSize();
       break;
       case 'undo_response':
       $("#" + data.card_id + "_card").replaceWith(getCardHTML(data, data.card_id));
-      $("#" + data.card_id + "_card").addClass("tic_selected");
+      $("#" + data.card_id + "_card").addClass("tic_undone_card");
       enableCards();
       state.busy = false;
-      console.log(data);
-
+      $("#" + data.card_id + "_card").click();
       break;
       case 'team_select':
       if(data.type == "request"){
-        $('#menu').css("display", "");
+        // $('#menu').css("display", "");
       } else if(data.type == "response"){
         if(data.response == "true"){
           //YAAAAY
@@ -96,7 +92,6 @@ function connectToServer(conn) {
       } else {
         playingAs = player_id;
       }
-      console.log("START TURN");
       break;
       case 'player_info':
       data.players.forEach((player) => {
@@ -112,10 +107,10 @@ function connectToServer(conn) {
       });
       break;
       case "start_round":
+      disableCards();
       enableSwap();
       break;
       case "swap_card_response":
-      console.log(data);
       if(data.result){
         disableSwap();
         state.busy = false;
@@ -144,7 +139,6 @@ function connectToServer(conn) {
       state.busy = false;
       break;
       case 'playability':
-      console.log(data);
       var throwaway = true;
       data.cards.forEach((c) => {
         var card = $("#" + c.id + "_card");
@@ -163,7 +157,6 @@ function connectToServer(conn) {
       case 'deal':{
         $("#hand_cards").html("");
         data.cards.forEach((c) => {
-          console.log(c);
           $("#hand_cards").append(getCardHTML(c, $('.tic_card').length));
         });
 
@@ -183,6 +176,8 @@ function selectTeam(team) {
   connection.sendJSON(data);
 }
 
-$(".team_btn").on("click", function(){
+$(".team-card").on("click", function(){
+  $('.team-card').css("color", "Silver").addClass("unselected");
+  $(this).css("color", "Black").removeClass("unselected");
   selectTeam(parseInt($(this).prop("id").split()[0]));
 });

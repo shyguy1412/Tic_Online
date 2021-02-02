@@ -150,6 +150,7 @@ function enableCards() {
         ]
         disableCards()
         move.moveData.card_value = cardValue;
+        if($(card).hasClass("tic_undone_card"))move.moveData.undone = true;
         connection.sendJSON(move);
         Field.eventTarget.removeEventListener("click", eventFunction);
       }
@@ -165,7 +166,6 @@ function enableCards() {
     var id = $(this).prop("id").split("_")[0];
     var cardValue = $("#" + id + "_value").html();
     var card = this;
-    console.log("SELECT");
     $(card).addClass("tic_selected");
 
     state.busy = true; //lock other cards
@@ -179,7 +179,6 @@ function enableCards() {
       //calculate the amount of dots that have been selected
       var dotId = parseInt(e.currentTarget.id.split("_")[2]);
       var value = 0;
-      console.log("DOT");
       var repeat = false;
       for(let i = dotId; i > 0; i--){
         var dot = $("#" + id +"_btn_" + i);
@@ -195,7 +194,6 @@ function enableCards() {
 
 
       var eventFunction = function(e){
-        console.log("MARBLE");
         var marble = e.data.marble;
         if(marble.player_id != playingAs)return;
 
@@ -219,7 +217,8 @@ function enableCards() {
                     pos: marble.pos,
                     dummy: true,
                     value: pos - marble.pos.id,
-                    user_id: user_id
+                    user_id: user_id,
+                    player_id: playingAs
                   }
                 }
               }
@@ -242,7 +241,7 @@ function enableCards() {
         }
         disableCards()
         move.moveData.card_value = cardValue;
-        console.log(move);
+        if($(card).hasClass("tic_undone_card"))move.moveData.undone = true;
         connection.sendJSON(move);
         lock = false;//remove lock
         Field.eventTarget.removeEventListener("click", eventFunction);
@@ -258,7 +257,6 @@ function enableCards() {
     onMarbleClick(this, {type: "number", id:id});
     onDoubleClick(this, buildMove({move:"skip",id:id}));
     if(!state.busy){
-      console.log("SELECT");
       $(this).addClass("tic_selected");
       state.busy = true;
     }
@@ -273,7 +271,6 @@ function enableCards() {
     move.moveData.endTurn = false;
     onDoubleClick(this, move);
     if(!state.busy){
-      console.log("SELECT");
       $(this).addClass("tic_selected");
       state.busy = true;
     }
@@ -288,6 +285,7 @@ function buildMove(card){
     moveData: {
       endTurn: true,
       startTurn: true,
+      undone: false,
       type: card.move,
       card_value: card.value,
       card_id: card.id
@@ -296,7 +294,6 @@ function buildMove(card){
 }
 
 function disableCards() {
-  console.log("DISABLE CARDS");
   disableHover();
   $(".tic_card").prop("onclick", null).off("click");
   $(".tic_card").removeClass("tic_hovered");
@@ -330,6 +327,7 @@ function onDoubleClick(sender, move){
     var id = $(sender).prop("id").split("_")[0];
     var cardValue = $("#" + id + "_value").html();
     if(move.action == "move")move.moveData.card_value = cardValue;
+    if($(sender).hasClass("tic_undone_card"))move.moveData.undone = true;
     connection.sendJSON(move);
     return;
   }
@@ -348,7 +346,6 @@ function onMarbleClick(sender, data) {
       move = buildMove({move:"number", id:data.id});
       move.moveData.marble = {area: marble.pos.area, pos: marble.pos.id};
       move.moveData.value = data.value;
-      console.log(move);
       break;
       case "backwards":
       move = buildMove({move:"backwards", id:data.id});
@@ -358,6 +355,7 @@ function onMarbleClick(sender, data) {
     }
     move.moveData.card_value = cardValue;
     disableCards()
+    if($(sender).hasClass("tic_undone_card"))move.moveData.undone = true;
     connection.sendJSON(move);
     Field.eventTarget.removeEventListener("click", eventFunction);
   }

@@ -15,62 +15,59 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 body{
-  background-color: #FFD399;
+	background-color: #FFD399;
 }
 
 .height-third {
-  min-height: 33vh;
+	min-height: 33vh;
 }
 
 .game-btn {
-  text-align: center;
-  font-size: 13pt;
-  margin-bottom: 3vh;
-  font-family: 'Rajdhani', sans-serif;
+	text-align: center;
+	font-size: 13pt;
+	margin-bottom: 3vh;
+	font-family: 'Rajdhani', sans-serif;
 }
 
 .team_headline{
-  margin-top: 0px;
+	margin-top: 0px;
 }
 
-.team_btn{
-  font-size: 2.5vh;
+.team-card {
+	color: Silver;
 }
+
 .team_member{
-  font-size: 1.9vh;
+	font-size: 1.9vh;
 }
 
 .team_members{
-  height: 12.5vh;
+	height: 12.5vh;
 }
 
 .tic_team_select{
-  margin-top: 20vh;
-  margin-bottom: auto;
-  margin-left: 1.5vh;
-  margin-right: 1.5vh;
-  padding: 2vh;
-  height: 25vh;
-  background-color: white;
-  border-radius: 3vh;
-  font-family: 'Rajdhani', sans-serif;
-  position: relative;
-  text-align: center;
+	margin-left: 1.5vh;
+	margin-right: 1.5vh;
+	padding: 2vh;
+	height: 40vh;
+	background-color: white;
+	border-radius: 3vh;
+	font-family: 'Rajdhani', sans-serif;
+	text-align: center;
 }
 
-/* input {
-padding: 20px 20px;
+input {
+	padding: 20px 20px;
 }
 
-input,
-input::-webkit-input-placeholder {
-font-size: 13pt;
-line-height: 1;
-font-family: 'Yusei Magic', sans-serif;
-} */
+input, input::-webkit-input-placeholder {
+	font-size: 13pt;
+	line-height: 1;
+	font-family: 'Rajdhani', sans-serif;
+}
 
 h1{
-  text-align: center;
-  font-size: 5vh;
-  font-family: 'Rajdhani', sans-serif;
+	text-align: center;
+	font-size: 5vh;
+	font-family: 'Rajdhani', sans-serif;
 }

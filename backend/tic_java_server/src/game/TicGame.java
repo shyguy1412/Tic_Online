@@ -76,6 +76,7 @@ public class TicGame {
 					if (p.getId() == this.turnOfPlayer) {
 						this.startTurnOf(client);
 					}
+					if (this.started) p.client.socket.send(new JSONObject().put("action", "start_game").toString());
 					if (this.swapping) p.client.socket.send(new JSONObject().put("action", "start_round").toString());
 				}
 				return true;
@@ -149,6 +150,10 @@ public class TicGame {
 		}
 		this.sendBoardStateToPlayers();
 		this.started = true;
+		this.sendPlayerInfoToPlayers();
+		for (TicPlayer p : players) {
+			p.client.socket.send(new JSONObject().put("action", "start_game").toString());
+		}
 		this.startRound();
 		this.turnOfPlayer = (int) (Math.floor(Math.random() * 100)) % 4;
 	}
@@ -157,11 +162,9 @@ public class TicGame {
 //		TicServer.printDebug("MOVE: " + moveData.toString());
 		String card = moveData.getString("type");
 		// Save boardstate before moving
-//		TicServer.printDebug(card);
-		if (moveData.getBoolean("endTurn")) {
+		if (moveData.getBoolean("endTurn") && !moveData.getBoolean("undone")) {
 			this.undoState.put("card", Integer.parseInt(moveData.getString("card_value")));
 			this.undoState.put("board", this.getBoardState());
-//			TicServer.printDebug("SAVE BOARD STATE: ");
 //			TicServer.printDebug(undoState.toString());
 		}
 //		TicServer.printDebug("Do move:");
@@ -195,7 +198,7 @@ public class TicGame {
 		for (TicMarble m : client.player.marbles) {
 			m.done = this.board.checkIfDone(m);
 		}
-		if(client.player.isDone() && !moveData.getBoolean("endTurn")) {
+		if (client.player.isDone() && !moveData.getBoolean("endTurn")) {
 			JSONObject responseData = new JSONObject();
 			responseData.put("action", "move_response");
 			responseData.put("done", client.player.isDone());
@@ -240,13 +243,13 @@ public class TicGame {
 
 	private boolean handleEnterMove(JSONObject moveData) {
 		TicPlayer player = this.getPlayerByUserId(moveData.getString("user_id"));
-		if (player.getId() == 0 && !player.isDone()){
-			for (int i = 1; i < 4; i++) {
-				TicArea area = board.getHomeArea(player.getId());
-				area.fields[i].place(player.marbles[i]);
-			}
-//			return true;
-		}
+//		if (player.getId() == 0 && !player.isDone()) {
+//			for (int i = 1; i < 4; i++) {
+//				TicArea area = board.getHomeArea(player.getId());
+//				area.fields[i].place(player.marbles[i]);
+//			}
+////			return true;
+//		}
 
 		if (!player.isDone()) {
 			return this.board.addNewMarbleToPlay(player);
@@ -285,6 +288,7 @@ public class TicGame {
 	}
 
 	private boolean handleUndoMove(JSONObject moveData) {
+		JSONObject state = this.getBoardState();
 		TicClient client = this.getPlayerByUserId(moveData.getString("user_id")).client;
 		this.loadState(this.undoState);
 		JSONObject undoData = new JSONObject();
@@ -296,7 +300,7 @@ public class TicGame {
 		client.socket.send(undoData.toString());
 		client.player.removeCard(Integer.parseInt(moveData.getString("card_value")));
 		client.player.cards.add(cardEffect);
-
+		this.undoState.put("board", state);
 		return true;
 	}
 
@@ -310,6 +314,7 @@ public class TicGame {
 				break;
 			}
 		}
+		TicServer.printDebug(player.ready + ":" + teampartner.ready);
 		TicCard card = new TicCard(Integer.parseInt(data.getString("card_value")));
 		card.hidden = !teampartner.ready;
 		teampartner.cards.add(card);
@@ -342,10 +347,9 @@ public class TicGame {
 		this.roundMaster = ++this.turnOfPlayer % 4;
 		this.turnOfPlayer = roundMaster;
 		this.swapping = true;
-		this.sendPlayerInfoToPlayers();
 		TicServer.printDebug("Turn of player: " + this.turnOfPlayer);
 		for (TicPlayer p : players) {
-			deck.dealToPlayer(p, 5);
+			deck.dealToPlayer(p, 1);
 			p.ready = false;
 			p.client.socket.send(new JSONObject().put("action", "start_round").toString());
 		}
@@ -520,7 +524,6 @@ public class TicGame {
 		} else {
 			marbles = player.marbles;
 		}
-
 		boolean marbleInPlay = false;
 		boolean marbleInPlayingArea = false;
 		boolean marbleInStartArea = false;
@@ -544,6 +547,7 @@ public class TicGame {
 			undoCard = new JSONObject();
 			undoCard.put("value", this.undoState.getInt("card"));
 			undoCard.put("type", new TicCard(undoCard.getInt("value")).type);
+			if(undoCard.getString("type").equals("undo"))undoCard = null;
 		}
 		for (int i = 0; i < cards.length(); i++) {
 			boolean playable = false;

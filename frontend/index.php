@@ -67,7 +67,18 @@ $room_code = isset($_GET['room_code']) ? $_GET['room_code'] : "";
 
         <input class="form-control" type="text" autocapitalize="off" style="margin-bottom: 7vh;" id="nickname_field" placeholder="Enter a Nickname" data-container="body" data-toggle="popover" data-placement="top" data-content />
 
-        <?php	if(empty($room_code)){ echo '<div class="btn btn-block btn-default game-btn" id="create_room_btn">Create Room</div>'; } ?>
+        <?php	if(empty($room_code)){ echo '
+        <div class="btn btn-block btn-default game-btn" id="create_room_btn">Create Room</div>
+        
+        <div class="row collapse" id="create_form">
+          <div class="col-xs-12">
+            <div class="row">
+              <div class="col-xs-12">
+              	<div class="btn btn-info btn-block" id="create_form_submit"  style="margin-bottom: 10px;">Make Thingy Go</div>
+              </div>
+            </div>
+          </div>
+        </div>'; } ?>
 
         <div class="btn btn-block btn-default game-btn" id="join_room">Join Room</div>
 
@@ -123,7 +134,11 @@ $('#join_submit').on("click", function() {
 });
 
 $('#create_room_btn').on("click", function() {
-  createRoom()
+    $('#create_form').collapse("toggle");
+});
+
+$('#create_form_submit').on("click", function() {
+    createRoom();
 });
 
 function enterRoom(){
