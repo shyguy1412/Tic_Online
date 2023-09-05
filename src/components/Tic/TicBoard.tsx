@@ -1,23 +1,28 @@
 import { h } from "preact";
-import '@/style/TicBoard.css';
 import { TicHome } from "@/components/Tic/TicHome";
 import { TicCenter } from "@/components/Tic/TicCenter";
 import { TicFields } from "@/components/Tic/TicFields";
+import { Marble } from "@/lib/tic/Marble";
+import { TicGameState } from "@/lib/tic/State";
+
+import '@/components/Tic/style/Tic.css';
 
 type Props = {
+  state: TicGameState;
+};
 
-}
-
-export function TicBoard({}:Props){
+export function TicBoard({ state }: Props) {
 
   return <div className="tic-board">
-    <TicHome></TicHome>
-    <TicHome></TicHome>
-    <TicHome></TicHome>
-    <TicHome></TicHome>
-
-    <TicCenter></TicCenter>
+    <div className="tic-home-wrapper">
+      <TicHome marbles={state.homes[0] ?? []}></TicHome>
+      <TicHome marbles={state.homes[1] ?? []}></TicHome>
+      <TicHome marbles={state.homes[2] ?? []}></TicHome>
+      <TicHome marbles={state.homes[3] ?? []}></TicHome>
+    </div>
 
     <TicFields></TicFields>
-  </div>
+    <TicCenter></TicCenter>
+
+  </div>;
 }

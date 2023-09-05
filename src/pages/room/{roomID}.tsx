@@ -1,9 +1,10 @@
 import { h, Fragment } from 'preact';
-import { useState } from 'preact/hooks';
 import { Document } from '@/components/Document';
 import { Head } from '@/components/Head';
 import { Request } from 'express';
 import { TicBoard } from '@/components/Tic/TicBoard';
+import { useServerSentEvents } from 'squid-ssr/hooks';
+
 import '@/style/roomID.css';
 import '@/style/fullscreen.css';
 
@@ -20,7 +21,13 @@ type Props = {
 } & ReturnType<typeof getServerSideProps>['props'];
 
 export default function App({ name }: Props) {
-  const [count, setCount] = useState<number>(0);
+
+  // const sse = useServerSentEvents('/api/v0/room/sse');
+
+  // sse.addEventListener('test', ({ detail: data }) => {
+  //   console.log(data);
+
+  // });
 
   return <>
     <Document>
@@ -29,7 +36,18 @@ export default function App({ name }: Props) {
       </Head>
 
       <div className="game-wrapper">
-        <TicBoard></TicBoard>
+        <TicBoard
+          state={{
+            homes:
+              [[{
+                id: '1',
+                color: '#ff0000',
+                owner: 'player1',
+              }]],
+            field: [],
+            currentPlayer: 'player1'
+          }}
+        ></TicBoard>
       </div>
 
     </Document>
