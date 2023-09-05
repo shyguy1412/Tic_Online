@@ -44,6 +44,23 @@ export default function App({ name }: Props) {
                 color: '#ff0000',
                 owner: 'player1',
               }]],
+            goals: [[{
+              id: '1',
+              color: '#ff0000',
+              owner: 'player1',
+            }],[{
+              id: '1',
+              color: '#00ff00',
+              owner: 'player1',
+            }], [{
+              id: '1',
+              color: '#0000ff',
+              owner: 'player1',
+            }], [{
+              id: '1',
+              color: '#ffff00',
+              owner: 'player1',
+            }]],
             field: [],
             currentPlayer: 'player1'
           }}
