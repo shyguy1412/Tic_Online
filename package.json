@@ -7,6 +7,7 @@
     "dev": "squid dev",
     "build": "squid build",
     "start": "squid start",
+    "electron": "electron src/electron/main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,15 +21,21 @@
   },
   "homepage": "https://github.com/NilsRamstoeck/Tic_Online#readme",
   "dependencies": {
+    "body-parser": "^1.20.2",
+    "cookie-parser": "^1.4.6",
     "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "normalize.css": "^8.0.1",
     "preact": "^10.17.1",
     "preact-render-to-string": "^6.2.1",
     "squid-ssr": "file:../../TypeScript/Squid"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.3",
     "@types/express": "^4.17.17",
     "chokidar": "^3.5.3",
     "esbuild": "^0.19.2",
+    "electron": "^26.1.0",
     "typescript": "^5.2.2"
   }
 }

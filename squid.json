@@ -1,5 +1,5 @@
 {
   "buildOptions": {
-    "external": []
+    "external": ["cookie-parser", "body-parser"]
   }
 }

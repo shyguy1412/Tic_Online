@@ -1,4 +1,6 @@
 import type { Request, Response } from 'express';
+import { useCookies } from 'squid-ssr/hooks';
+import crypto from 'crypto';
 
 const methods = {
   GET: (req: Request, res: Response) => _get(req, res),
@@ -19,34 +21,55 @@ export default async function handler(req: Request, res: Response) {
 }
 
 async function _get(req: Request, res: Response) {
-  res.status(200).json({
-    hello: req.params.thing
-  });
+  res.status(400).send('Method does not exist for this route');
 }
 
 async function _post(req: Request, res: Response) {
-  res.status(500).send('Method does not exist for this route');
+  console.log(req.body);
+
+  if (!req.body.username || typeof req.body.username != 'string') {
+    return res.status(400).send('Bad Request');
+  }
+
+  const cookies = useCookies(req, res);
+
+  const roomID = crypto
+    .createHash('md5')
+    .update(Date.now() + '')
+    .digest()
+    .toString('hex');
+
+  cookies.add({
+    key: 'tic_room',
+    value: {
+      name: req.body.username,
+      room: roomID
+    },
+    path: '/'
+  });
+
+  res.redirect(`/room/${roomID}`);
 }
 
 async function _put(req: Request, res: Response) {
-  res.status(500).send('Method does not exist for this route');
+  res.status(400).send('Method does not exist for this route');
 }
 
 async function _delete(req: Request, res: Response) {
-  res.status(500).send('Method does not exist for this route');
+  res.status(400).send('Method does not exist for this route');
 }
 
 async function _head(req: Request, res: Response<any>) {
-  res.status(500).send('Method does not exist for this route');
+  res.status(400).send('Method does not exist for this route');
 }
 async function _update(req: Request, res: Response<any>) {
-  res.status(500).send('Method does not exist for this route');
+  res.status(400).send('Method does not exist for this route');
 }
 
 async function _trace(req: Request, res: Response<any>) {
-  res.status(500).send('Method does not exist for this route');
+  res.status(400).send('Method does not exist for this route');
 }
 
 async function _options(req: Request, res: Response) {
-  res.status(500).send('Method does not exist for this route');
+  res.status(400).send('Method does not exist for this route');
 }
