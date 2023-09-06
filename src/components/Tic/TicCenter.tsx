@@ -5,5 +5,5 @@ type Props = {
 };
 
 export function TicCenter({ }: Props) {
-  return <div></div>;
+  return <div className="tic-center"></div>;
 }

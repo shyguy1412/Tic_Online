@@ -65,6 +65,8 @@ export default function App({ name }: Props) {
             currentPlayer: 'player1'
           }}
         ></TicBoard>
+
+        TicHand
       </div>
 
     </Document>

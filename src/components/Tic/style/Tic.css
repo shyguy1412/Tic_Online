@@ -40,7 +40,7 @@
   position: absolute;
   display: grid;
 
-  --goal-offset: 0.08;
+  --goal-offset: 0.15;
 
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
@@ -80,6 +80,23 @@
   transform: translate(calc(var(--board-size) * var(--marble-size)/2 * -1), calc(var(--board-size) * var(--goal-offset)));
 }
 
+.tic-center {
+  position: absolute;
+
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 100%;
+
+  --center-size: 0.25;
+
+  left: calc(var(--board-size) / 2);
+  top: calc(var(--board-size) / 2);
+
+  transform: translate(-50%, -50%);
+
+  width: calc(var(--board-size) * var(--center-size));
+  height: calc(var(--board-size) * var(--center-size));
+}
+
 .tic-marble-slot {
   --opacity: 0.4;
   background-color: rgba(120, 120, 120, var(--opacity));
@@ -103,10 +120,11 @@
 }
 
 .tic-board {
-  --board-size: min(80vh, 80vw);
+  --board-size: min(70vh, 70vw);
   --marble-size: 0.043;
 
   background-image: url("/walnut-wood-textured-background-design.jpg");
+  background-size: 100%;
 
   position: relative;
   background-color: brown;
@@ -130,5 +148,4 @@
 
   left: calc((var(--board-size)/2) + ((var(--board-size)*var(--radius)) * cos((var(--marble-index)/60) * (2*var(--PI))) - (var(--board-size) * var(--marble-size))/2));
   top: calc((var(--board-size)/2) + ((var(--board-size)*var(--radius)) * sin((var(--marble-index)/60) * (2*var(--PI))) - (var(--board-size) * var(--marble-size))/2));
-
 }

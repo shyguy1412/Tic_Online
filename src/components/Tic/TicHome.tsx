@@ -1,9 +1,9 @@
 import { TicMarbleSlot } from "@/components/Tic/TicMarbleSlot";
-import { Marble } from "@/components/Tic/types/Marble";
+import { TicMarble } from "@/components/Tic/types/TicMarble";
 import { h } from "preact";
 
 type Props = {
-  marbles: Marble[];
+  marbles: TicMarble[];
 };
 
 export function TicHome({ marbles }: Props) {

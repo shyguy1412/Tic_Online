@@ -1,4 +1,4 @@
-export interface Marble{
+export interface TicMarble{
   color: string,
   id: string, 
   owner: string
