@@ -2,11 +2,10 @@ import { h, Fragment } from 'preact';
 import { Document } from '@/components/Document';
 import { Head } from '@/components/Head';
 import { Request } from 'express';
-import { TicBoard } from '@/components/Tic/TicBoard';
-import { useServerSentEvents } from 'squid-ssr/hooks';
 
 import '@/style/roomID.css';
 import '@/style/fullscreen.css';
+import { TicGame } from '@/components/Tic/TicGame';
 
 export function getServerSideProps(req: Request) {
   return {
@@ -35,39 +34,7 @@ export default function App({ name }: Props) {
         <title>Tic Online</title>
       </Head>
 
-      <div className="game-wrapper">
-        <TicBoard
-          state={{
-            homes:
-              [[{
-                id: '1',
-                color: '#ff0000',
-                owner: 'player1',
-              }]],
-            goals: [[{
-              id: '1',
-              color: '#ff0000',
-              owner: 'player1',
-            }],[{
-              id: '1',
-              color: '#00ff00',
-              owner: 'player1',
-            }], [{
-              id: '1',
-              color: '#0000ff',
-              owner: 'player1',
-            }], [{
-              id: '1',
-              color: '#ffff00',
-              owner: 'player1',
-            }]],
-            field: [],
-            currentPlayer: 'player1'
-          }}
-        ></TicBoard>
-
-        TicHand
-      </div>
+      <TicGame></TicGame>
 
     </Document>
   </>;

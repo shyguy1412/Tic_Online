@@ -21,14 +21,15 @@ export function TicBoard({ state }: Props) {
       <TicHome marbles={state.homes[3] ?? []}></TicHome>
     </div>
 
+    <TicFields></TicFields>
+
     <div className="tic-goal-wrapper">
       <TicGoal marbles={state.goals[0] ?? []}></TicGoal>
       <TicGoal marbles={state.goals[1] ?? []}></TicGoal>
       <TicGoal marbles={state.goals[2] ?? []}></TicGoal>
       <TicGoal marbles={state.goals[3] ?? []}></TicGoal>
     </div>
-
-    <TicFields></TicFields>
+    
     <TicCenter></TicCenter>
 
   </div>;

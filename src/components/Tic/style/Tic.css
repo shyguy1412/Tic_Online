@@ -1,3 +1,62 @@
+@import url(./Cards.css);
+
+.tic-game-wrapper {
+  --PI: 3.14159265359;
+
+  --card-size: min(10vh, 10vw);
+
+  --game-layout-gap: min(5vh, 5vw);
+
+  --board-size: min(80vh, 80vw);
+  --center-size: 0.25;
+  --marble-size: 0.043;
+
+  --goal-offset: 0.15;
+
+  --marble-slot-opacity: 0.4;
+
+  --fields-radius: 0.44;
+
+  display: flex;
+  flex-direction: row;
+
+  gap: var(--game-layout-gap);
+  font-weight: 700;
+
+  align-items: center;
+  justify-content: center;
+
+  height: 100%;
+  width: 100%;
+}
+
+@media screen and (orientation:portrait) {
+  .tic-game-wrapper{
+    flex-direction: column
+  }
+
+  .tic-hand{
+    flex-direction: row;
+  }
+}
+
+.tic-game-wrapper * {
+  box-sizing: border-box;
+}
+
+.tic-board {
+  background-image: url("/walnut-wood-textured-background-design.jpg");
+  background-size: 100%;
+
+  position: relative;
+  background-color: brown;
+
+  flex-shrink: 0;
+
+  width: var(--board-size);
+  height: var(--board-size);
+}
+
 .tic-home-wrapper {
   position: absolute;
   display: grid;
@@ -40,7 +99,6 @@
   position: absolute;
   display: grid;
 
-  --goal-offset: 0.15;
 
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
@@ -86,7 +144,6 @@
   background-color: rgba(0, 0, 0, 0.6);
   border-radius: 100%;
 
-  --center-size: 0.25;
 
   left: calc(var(--board-size) / 2);
   top: calc(var(--board-size) / 2);
@@ -98,8 +155,7 @@
 }
 
 .tic-marble-slot {
-  --opacity: 0.4;
-  background-color: rgba(120, 120, 120, var(--opacity));
+  background-color: rgba(120, 120, 120, var(--marble-slot-opacity));
 
   border-radius: 100%;
   border: calc(var(--board-size) * 0.005) solid black;
@@ -111,26 +167,8 @@
 }
 
 .tic-marble-slot:hover {
-  background-color: rgba(255, 255, 255, var(--opacity));
+  background-color: rgba(255, 255, 255, var(--marble-slot-opacity));
   filter: brightness(80%);
-}
-
-.tic-board * {
-  box-sizing: border-box;
-}
-
-.tic-board {
-  --board-size: min(70vh, 70vw);
-  --marble-size: 0.043;
-
-  background-image: url("/walnut-wood-textured-background-design.jpg");
-  background-size: 100%;
-
-  position: relative;
-  background-color: brown;
-
-  width: var(--board-size);
-  height: var(--board-size);
 }
 
 .tic-fields {
@@ -143,9 +181,6 @@
 .tic-fields>.tic-marble-slot {
   position: absolute;
 
-  --PI: 3.14159265359;
-  --radius: 0.44;
-
-  left: calc((var(--board-size)/2) + ((var(--board-size)*var(--radius)) * cos((var(--marble-index)/60) * (2*var(--PI))) - (var(--board-size) * var(--marble-size))/2));
-  top: calc((var(--board-size)/2) + ((var(--board-size)*var(--radius)) * sin((var(--marble-index)/60) * (2*var(--PI))) - (var(--board-size) * var(--marble-size))/2));
+  left: calc((var(--board-size)/2) + ((var(--board-size)*var(--fields-radius)) * cos((var(--marble-index)/60) * (2*var(--PI))) - (var(--board-size) * var(--marble-size))/2));
+  top: calc((var(--board-size)/2) + ((var(--board-size)*var(--fields-radius)) * sin((var(--marble-index)/60) * (2*var(--PI))) - (var(--board-size) * var(--marble-size))/2));
 }

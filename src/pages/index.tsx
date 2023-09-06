@@ -4,6 +4,8 @@ import { Document } from '@/components/Document';
 import { Head } from '@/components/Head';
 import { useCookies } from 'squid-ssr/hooks';
 import { Request, Response } from 'express';
+import { TicBoard } from '@/components/Tic/TicBoard';
+import { TicGame } from '@/components/Tic/TicGame';
 
 export function getServerSideProps(req: Request, res: Response) {
 

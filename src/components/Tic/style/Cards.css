@@ -1,0 +1,122 @@
+.tic-help-btn {
+  position: absolute;
+  right: calc(var(--card-size) * 0.05);
+  top: calc(var(--card-size) * 0.05);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  color: gray;
+
+  border-radius: 100%;
+  border: calc(var(--board-size) * 0.003) solid gray;
+
+  height: calc(var(--card-size) * 0.25);
+  width: calc(var(--card-size) * 0.25);
+
+  font-size:calc(var(--card-size) *  0.15);
+}
+
+.tic-help-btn:hover {
+  color: white;
+  border-color: black;
+  background-color: rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+}
+
+.tic-hand {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  flex-shrink: 1;
+
+  justify-content: center;
+  align-items: center;
+
+  gap: calc(var(--board-size) * 0.035);
+  font-size: calc(var(--card-size) * 0.75);
+
+  max-height: var(--board-size);
+  max-width: var(--board-size);
+}
+
+.tic-card {
+  position: relative;
+
+  user-select: none;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  flex-shrink: 0;
+
+  border-radius: 10%;
+  background-color: white;
+
+  height: var(--card-size);
+  width: var(--card-size);
+}
+
+.tic-card:hover {
+  outline: calc(var(--board-size) * 0.005) solid gray;
+}
+
+.tic-card.tic-card-selected {
+  outline: calc(var(--board-size) * 0.005) solid black;
+}
+
+.tic-card-special {
+  color: red;
+}
+
+.tic-card-text {
+  font-size: calc(var(--card-size) * 0.4);
+  font-weight: lighter;
+}
+
+.tic-card-icon {
+  font-size: calc(var(--card-size) * 0.7);
+}
+
+.tic-confirm-card {
+  display: flex;
+
+  gap: calc(var(--card-size) * 0.1);
+
+  font-size: calc(var(--card-size) * 0.3);
+}
+
+.tic-confirm-card>span {
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 100%;
+  outline: calc(var(--board-size) * 0.005) solid black;
+
+  transform: translate(0, calc(var(--board-size) * 0.01));
+
+  color: white;
+
+  height: calc(var(--card-size) * 0.35);
+  width: calc(var(--card-size) * 0.35);
+}
+
+.tic-confirm-card>span:hover {
+  filter: brightness(80%);
+}
+
+.tic-confirm-card>.option-confirm {
+  background-color: green;
+}
+
+.tic-confirm-card>.option-reject {
+  background-color: red;
+}
+
+.tic-unplayable {
+  background-color: lightgray;
+}
