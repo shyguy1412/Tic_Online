@@ -5,7 +5,9 @@
       "body-parser"
     ],
     "loader": {
-      ".jpg": "file"
-    }
+      ".jpg": "file",
+      ".env.local": "text"
+    },
+    "minify": true
   }
 }

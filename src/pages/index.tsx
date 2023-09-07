@@ -1,11 +1,10 @@
 import { h, Fragment } from 'preact';
-import { useState } from 'preact/hooks';
 import { Document } from '@/components/Document';
 import { Head } from '@/components/Head';
 import { useCookies } from 'squid-ssr/hooks';
 import { Request, Response } from 'express';
-import { TicBoard } from '@/components/Tic/TicBoard';
-import { TicGame } from '@/components/Tic/TicGame';
+
+const { API_PREFIX } = process.env;
 
 export function getServerSideProps(req: Request, res: Response) {
 
@@ -23,12 +22,12 @@ type Props = {
 
 export default function App({ }: Props) {
 
-return <>
+  return <>
     <Document>
       <Head>
         <title>Tic Online</title>
       </Head>
-      <form action="/api/v0/room" method="POST">
+      <form action={`${API_PREFIX}/room`} method="POST">
         <input name="username" required={true} type="text" />
         <button>Create new room</button>
       </form>
