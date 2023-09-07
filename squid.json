@@ -1,5 +1,11 @@
 {
   "buildOptions": {
-    "external": ["cookie-parser", "body-parser"]
+    "external": [
+      "cookie-parser",
+      "body-parser"
+    ],
+    "loader": {
+      ".jpg": "file"
+    }
   }
 }
