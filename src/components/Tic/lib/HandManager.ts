@@ -1,4 +1,9 @@
-import { TicCard } from "@/components/Tic/types/TicCard";
+import { TicCard } from "@/lib/tic/types/TicCard";
+import config from "@/config";
+
+const {
+  API_PREFIX
+} = config;
 
 export interface HandManagerState {
   cardsActive: boolean,
@@ -13,7 +18,7 @@ export type HandManagerAction = 'select-card' | 'play-card';
 export interface HandManagerDispatch<T extends HandManagerAction = HandManagerAction> {
   action: T;
   data: T extends 'select-card' ? TicCard | null
-  : T extends 'select-card' ? TicCard
+  : T extends 'play-card' ? TicCard
   : never;
 };
 
@@ -27,12 +32,20 @@ const ActionHandler: HandManagerActionHandlerMap = {
   "select-card": function (state: HandManagerState, { action, data }: HandManagerDispatch<"select-card">): HandManagerState {
     return {
       ...state,
-      selectedCard: data,
+      selectedCard: state.cardsActive ? data : state.selectedCard,
     };
   },
   "play-card": function (state: HandManagerState, { action, data }: HandManagerDispatch<"play-card">): HandManagerState {
+    fetch(`${API_PREFIX}/play`, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+
     // throw new Error("Function not implemented.");
-    return state;
+    return {
+      ...state,
+      cardsActive: false
+    };
   }
 };
 

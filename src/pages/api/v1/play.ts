@@ -1,8 +1,6 @@
+import { Room } from '@/lib/models/Room';
 import type { Request, Response } from 'express';
 import { useCookies } from 'squid-ssr/hooks';
-import crypto from 'crypto';
-import { Room } from '@/lib/models/Room';
-import { v4 } from 'uuid';
 
 const methods = {
   GET: (req: Request, res: Response) => _get(req, res),
@@ -27,43 +25,29 @@ async function _get(req: Request, res: Response) {
 }
 
 async function _post(req: Request, res: Response) {
-  console.log(req.body);
-
-  if (!req.body.username || typeof req.body.username != 'string') {
-    return res.status(400).send('Bad Request');
-  }
-
   const cookies = useCookies(req, res);
 
-  const roomID = crypto
-    .createHash('md5')
-    .update(Date.now() + '')
-    .digest()
-    .toString('hex');
+  const roomCookie = cookies['tic_room'];
 
-  const userID = v4();
+  if (!roomCookie || typeof roomCookie != 'object') return res.status(401).send('Unauthorized');
 
-  const newRoom = await Room.create({
-    roomID,
-    users: [{
-      name: req.body.username,
-      userID
-    }]
+  const { name, roomID, userID } = roomCookie as { [key: string]: string | undefined; };
+
+  if (!name || !roomID || !userID)
+    return res.status(400).send('Bad Request');
+
+  const room = Room.find({
+    roomID
   });
 
-  newRoom.save();
+  //!check if current player
+  //!check if card has already been played
 
-  cookies.add({
-    key: 'tic_room',
-    value: {
-      name: req.body.username,
-      userID: userID,
-      roomID: roomID
-    },
-    path: '/'
-  });
+  try{
+    
+  }
 
-  res.redirect(`/room/${roomID}`);
+  // res.status(400).send('Method does not exist for this route');
 }
 
 async function _put(req: Request, res: Response) {

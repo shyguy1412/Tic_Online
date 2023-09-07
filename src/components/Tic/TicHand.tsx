@@ -1,6 +1,6 @@
-import { TicCardDisplay } from "@/components/Tic/cards/TicCard";
+import { TicCardDisplay } from "@/components/Tic/TicCardDisplay";
 import { HandManager, HandManagerReducer } from "@/components/Tic/lib/HandManager";
-import { TicCard } from "@/components/Tic/types/TicCard";
+import { TicCard } from "@/lib/tic/types/TicCard";
 import { createContext } from "preact";
 import { h } from "preact";
 import { useReducer } from "preact/hooks";

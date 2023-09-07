@@ -8,6 +8,6 @@
       ".jpg": "file",
       ".env.local": "text"
     },
-    "minify": true
+    "minify": false
   }
 }

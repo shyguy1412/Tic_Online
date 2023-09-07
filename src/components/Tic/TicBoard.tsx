@@ -2,7 +2,7 @@ import { h } from "preact";
 import { TicHome } from "@/components/Tic/TicHome";
 import { TicCenter } from "@/components/Tic/TicCenter";
 import { TicFields } from "@/components/Tic/TicFields";
-import { TicGameState } from "@/components/Tic/types/TicGameState";
+import { TicGameState } from "@/lib/tic/types/TicGameState";
 import { TicGoal } from "@/components/Tic/TicGoal";
 
 import '@/components/Tic/style/Tic.css';

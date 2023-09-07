@@ -1,6 +1,6 @@
 import { Modal } from "@/components/Modal";
 import { HandContext } from "@/components/Tic/TicHand";
-import { TicCard } from "@/components/Tic/types/TicCard";
+import { TicCard } from "@/lib/tic/types/TicCard";
 import { faBolt, faBrain, faCheck, faHandHoldingMedical, faQuestion, faRotateLeft, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FunctionComponent, h } from "preact";
@@ -53,13 +53,10 @@ export function TicCardDisplay({ card, selected }: Props) {
 
   if (!handManagerAction || !handManagerState) throw new Error("No HandManager instance");
 
-  const { cardsActive } = handManagerState;
-
   const CardComponent = CardComponents[card.type];
 
   return <div
     onClick={() => {
-      if (!cardsActive) return;
       handManagerAction({
         action: 'select-card',
         data: card
@@ -89,7 +86,8 @@ export function TicCardDisplay({ card, selected }: Props) {
             className="option-reject">
             <FontAwesomeIcon icon={faXmark}></FontAwesomeIcon>
           </span>
-        </div> :
+        </div>
+        :
         <CardComponent value={card.value ?? -1}></CardComponent>
     }
   </div>;

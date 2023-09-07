@@ -1,4 +1,4 @@
-import { TicMarble } from "@/components/Tic/types/TicMarble";
+import { TicMarble } from "@/lib/tic/types/TicMarble";
 
 export type TicGameState = {
   homes: TicMarble[][];
