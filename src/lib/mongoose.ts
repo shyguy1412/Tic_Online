@@ -1,3 +1,20 @@
-import { connect } from 'mongoose';
+import config from '@/config';
+import mongoose from "mongoose";
 
-export const db = await connect('localhost:27017', { pass: 'pass', user: 'root' });
+const {
+  MONGODB_USER,
+  MONGODB_PASS,
+  MONGODB_HOST,
+  MONGODB_PORT,
+} = config;
+
+mongoose.set('strictQuery', true);
+export function connectToDatabase() {
+  mongoose.connect(`mongodb://${MONGODB_USER}:${MONGODB_PASS}@${MONGODB_HOST}:${MONGODB_PORT}`, { dbName: 'tic-online' });
+};
+
+export function isConnectedToDatabase() {
+  return mongoose.connection.readyState == 1;
+}
+
+connectToDatabase();

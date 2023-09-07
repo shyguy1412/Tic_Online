@@ -31,7 +31,8 @@ const ActionHandler: HandManagerActionHandlerMap = {
     };
   },
   "play-card": function (state: HandManagerState, { action, data }: HandManagerDispatch<"play-card">): HandManagerState {
-    throw new Error("Function not implemented.");
+    // throw new Error("Function not implemented.");
+    return state;
   }
 };
 

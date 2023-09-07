@@ -1,7 +1,7 @@
 import { model, Schema } from 'mongoose';
 
 interface IRoom {
-  roomID: number,
+  roomID: String,
   users: {
     name: string,
     id: string;
@@ -9,8 +9,12 @@ interface IRoom {
 }
 
 const roomSchema = new Schema<IRoom>({
-  roomID: Number,
-  users: [{ name: String, id: Number }]
+  roomID: {
+    type: String,
+    unique: true,
+    index: true
+  },
+  users: [{ name: String, id: String }]
 });
 
 export const Room = model("Room", roomSchema);

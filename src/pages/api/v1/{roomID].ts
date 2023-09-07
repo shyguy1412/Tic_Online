@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
-import { createServerSentEventStream, useCookies } from 'squid-ssr/hooks';
-import crypto from 'crypto';
+import { createServerSentEventStream } from 'squid-ssr/hooks';
+import { Room } from '@/lib/models/Room';
+import { connectToDatabase } from '@/lib/mongoose';
 
 const methods = {
   GET: (req: Request, res: Response) => _get(req, res),
@@ -15,6 +16,7 @@ const methods = {
 
 
 export default async function handler(req: Request, res: Response) {
+  connectToDatabase();
   const method = req.method ?? 'GET';
   if (Object.hasOwn(methods, method))
     await methods[method as keyof typeof methods](req, res);
@@ -23,8 +25,9 @@ export default async function handler(req: Request, res: Response) {
 async function _get(req: Request, res: Response) {
   const sseStream = createServerSentEventStream(req, res);
 
-  sseStream.dispatch('test', {fancy:'data'});
+  sseStream.dispatch('test', { fancy: 'data' });
   sseStream.close();
+  Room.find();
 }
 
 async function _post(req: Request, res: Response) {

@@ -1,6 +1,8 @@
 import type { Request, Response } from 'express';
 import { useCookies } from 'squid-ssr/hooks';
 import crypto from 'crypto';
+import { Room } from '@/lib/models/Room';
+import { v4 } from 'uuid';
 
 const methods = {
   GET: (req: Request, res: Response) => _get(req, res),
@@ -39,10 +41,23 @@ async function _post(req: Request, res: Response) {
     .digest()
     .toString('hex');
 
+  const userID = v4();
+
+  const newRoom = await Room.create({
+    roomID,
+    users: [{
+      name: req.body.username,
+      id: userID
+    }]
+  });
+
+  newRoom.save();
+
   cookies.add({
     key: 'tic_room',
     value: {
       name: req.body.username,
+      id: userID,
       room: roomID
     },
     path: '/'
