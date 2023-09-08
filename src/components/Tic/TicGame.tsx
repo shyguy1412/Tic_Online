@@ -1,39 +1,19 @@
 import { TicBoard } from "@/components/Tic/TicBoard";
 import { TicHand } from "@/components/Tic/TicHand";
+import { TicBoardState } from "@/lib/tic/types/TicBoardState";
 import { h } from "preact";
 
 type Props = {
+  state?: TicBoardState;
 };
 
-export function TicGame({ }: Props) {
+export function TicGame({ state }: Props) {
   return <div className="tic-game-wrapper">
     <TicBoard
-      state={{
-        homes:
-          [[{
-            id: '1',
-            color: '#ff0000',
-            owner: 'player1',
-          }]],
-        goals: [[{
-          id: '1',
-          color: '#ff0000',
-          owner: 'player1',
-        }], [{
-          id: '1',
-          color: '#00ff00',
-          owner: 'player1',
-        }], [{
-          id: '1',
-          color: '#0000ff',
-          owner: 'player1',
-        }], [{
-          id: '1',
-          color: '#ffff00',
-          owner: 'player1',
-        }]],
-        field: [],
-        currentPlayer: 'player1'
+      state={state ?? {
+        homes: [],
+        fields: [],
+        goals: []
       }}
     ></TicBoard>
 

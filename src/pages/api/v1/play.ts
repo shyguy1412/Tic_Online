@@ -40,12 +40,8 @@ async function _post(req: Request, res: Response) {
     roomID
   });
 
-  //!check if current player
+  //!check if current players turn
   //!check if card has already been played
-
-  try{
-    
-  }
 
   // res.status(400).send('Method does not exist for this route');
 }

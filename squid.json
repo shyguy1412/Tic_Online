@@ -2,7 +2,8 @@
   "buildOptions": {
     "external": [
       "cookie-parser",
-      "body-parser"
+      "body-parser",
+      "mongoose"
     ],
     "loader": {
       ".jpg": "file",

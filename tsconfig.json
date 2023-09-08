@@ -7,7 +7,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "module": "esnext",
+    "module": "Node16",
     "moduleResolution": "Node16",
     "baseUrl": ".",
     "jsx": "react",

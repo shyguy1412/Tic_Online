@@ -1,26 +1,11 @@
+import { ServerSideProps } from '@/pages/index.props';
 import { h, Fragment } from 'preact';
 import { Document } from '@/components/Document';
 import { Head } from '@/components/Head';
-import { useCookies } from 'squid-ssr/hooks';
-import { Request, Response } from 'express';
 
 const { API_PREFIX } = process.env;
 
-export function getServerSideProps(req: Request, res: Response) {
-
-  const cookies = useCookies(req, res);
-
-  return {
-    props: {},
-    redirect: cookies['tic_room'] ? `/room/${cookies['tic_room'].room}` : undefined
-  };
-}
-
-type Props = {
-
-} & ReturnType<typeof getServerSideProps>['props'];
-
-export default function App({ }: Props) {
+export default function App({ }: ServerSideProps) {
 
   return <>
     <Document>

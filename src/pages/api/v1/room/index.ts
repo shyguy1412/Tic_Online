@@ -3,6 +3,7 @@ import { useCookies } from 'squid-ssr/hooks';
 import crypto from 'crypto';
 import { Room } from '@/lib/models/Room';
 import { v4 } from 'uuid';
+import { generateNewGame } from '@/lib/tic/GameLogic';
 
 const methods = {
   GET: (req: Request, res: Response) => _get(req, res),
@@ -48,7 +49,8 @@ async function _post(req: Request, res: Response) {
     users: [{
       name: req.body.username,
       userID
-    }]
+    }],
+    state: generateNewGame()
   });
 
   newRoom.save();

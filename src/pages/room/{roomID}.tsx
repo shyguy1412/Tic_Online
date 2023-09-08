@@ -1,25 +1,14 @@
+import type { ServerSideProps } from '@/pages/room/{roomID}.props';
 import { h, Fragment } from 'preact';
 import { Document } from '@/components/Document';
 import { Head } from '@/components/Head';
-import { Request } from 'express';
+import { TicGame } from '@/components/Tic/TicGame';
 
 import '@/style/roomID.css';
 import '@/style/fullscreen.css';
-import { TicGame } from '@/components/Tic/TicGame';
 
-export function getServerSideProps(req: Request) {
-  return {
-    props: {
-      name: req.params.roomID,
-    }
-  };
-}
+export default function App({ state }: ServerSideProps) {
 
-type Props = {
-
-} & ReturnType<typeof getServerSideProps>['props'];
-
-export default function App({ name }: Props) {
 
   // const sse = useServerSentEvents('/api/v0/room/sse');
 
@@ -28,13 +17,15 @@ export default function App({ name }: Props) {
 
   // });
 
+  console.log(state);
+
   return <>
     <Document>
       <Head>
         <title>Tic Online</title>
       </Head>
 
-      <TicGame></TicGame>
+      <TicGame state={state} ></TicGame>
 
     </Document>
   </>;
