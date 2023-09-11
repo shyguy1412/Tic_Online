@@ -47,6 +47,7 @@ const ActionHandler: HandManagerActionHandlerMap = {
     // throw new Error("Function not implemented.");
     return {
       ...state,
+      selectedCard: null,
       cardsActive: false
     };
   }

@@ -1,10 +1,13 @@
 import { Modal } from "@/components/Modal";
 import { HandContext } from "@/components/Tic/TicHand";
+import { PlayabilityResult } from "@/lib/tic/types/PlayabilityResult";
 import { TicCard } from "@/lib/tic/types/TicCard";
+import { TicGameStateContext } from "@/pages/room/{roomID}";
 import { faBolt, faBrain, faCheck, faHandHoldingMedical, faQuestion, faRotateLeft, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FunctionComponent, h } from "preact";
 import { useContext, useState } from "preact/hooks";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   card: TicCard;
@@ -16,7 +19,8 @@ type CardProps = {
 };
 
 type HelpModalProps = {
-
+  reasons: string[];
+  card: TicCard;
 };
 
 const CardComponents: { [key in TicCard['type']]: FunctionComponent<CardProps> } = {
@@ -49,21 +53,29 @@ const CardCSSClassList: { [key in TicCard['type']]: string[] } = {
 
 export function TicCardDisplay({ card, selected }: Props) {
 
+  const game = useContext(TicGameStateContext);
   const [_, handManagerAction] = useContext(HandContext) ?? [];
 
+  const playability: PlayabilityResult = game?.playability ? game.playability[card.id] : { playable: false, reasons: [''] };
 
   const CardComponent = CardComponents[card.type];
 
   return <div
     onClick={() => {
       if (!handManagerAction) return;
+      if (!playability.playable) return;
       handManagerAction({
         action: 'select-card',
         data: card
       });
     }}
-    className={["tic-card", ...CardCSSClassList[card.type], selected ? 'tic-card-selected' : ''].join(' ')}>
-    <HelpModal></HelpModal>
+    className={[
+      "tic-card",
+      ...CardCSSClassList[card.type],
+      selected ? 'tic-card-selected' : '',
+      playability.playable ? '' : 'tic-card-unplayable'
+    ].join(' ')}>
+    <HelpModal card={card} reasons={playability.playable ? [] : playability.reasons}></HelpModal>
     {
       selected ?
         <div className="tic-confirm-card">
@@ -97,8 +109,10 @@ export function TicCardDisplay({ card, selected }: Props) {
   </div>;
 }
 
-function HelpModal({ }: HelpModalProps) {
+function HelpModal({ reasons, card }: HelpModalProps) {
   const [open, setOpen] = useState(false);
+
+  const { t, i18n } = useTranslation();
 
   return <div
     onClick={(e) => {
@@ -107,10 +121,17 @@ function HelpModal({ }: HelpModalProps) {
     }}
     className="tic-help-btn">
     <FontAwesomeIcon icon={faQuestion}></FontAwesomeIcon>
-    <Modal open={open}>
+    <Modal open={open} onClose={() => setOpen(false)}>
+      {
+        !reasons.length || <div>{t("You can not play this card for the following reasons")}: <br />
+          {
+            reasons.map((s, i) => <div key={i}>{t(s, { value: card.value })}</div>)
+          }
+        </div>
+      }
       <button
         onClick={() => setOpen(false)}
-      >Close</button>
+      >{t('Close')}</button>
     </Modal>
   </div>;
 }

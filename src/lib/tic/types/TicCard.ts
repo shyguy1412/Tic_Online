@@ -1,6 +1,6 @@
 export type TicCard =
   {
-    id: number;
+    id: string;
   } &
   ({
     type: 'number' | 'split' | 'enter' | 'backwards' | 'skip',

@@ -3,20 +3,20 @@ import { HandManager, HandManagerReducer } from "@/components/Tic/lib/HandManage
 import { TicCard } from "@/lib/tic/types/TicCard";
 import { createContext } from "preact";
 import { h } from "preact";
-import { useReducer } from "preact/hooks";
+import { useContext, useReducer } from "preact/hooks";
 import { TicPlayerState } from "@/lib/tic/types/TicPlayerState";
+import { TicGameStateContext } from "@/pages/room/{roomID}";
 
-type Props = {
-  cards: TicCard[];
-  state: TicPlayerState;
-};
+type Props = {};
 
 export const HandContext = createContext<HandManager | null>(null);
 
-export function TicHand({ cards, state }: Props) {
+export function TicHand({ }: Props) {
+
+  const game = useContext(TicGameStateContext);
 
   const HandManager = useReducer(HandManagerReducer, {
-    cardsActive: state.type == 'choose',
+    cardsActive: game?.state?.type == 'choose',
     selectedCard: null
   });
 
@@ -24,7 +24,7 @@ export function TicHand({ cards, state }: Props) {
 
   return <HandContext.Provider value={HandManager}>
     <div className='tic-hand'>
-      {cards.map((card, i) => <TicCardDisplay
+      {game?.hand?.map((card, i) => <TicCardDisplay
         key={i}
         card={card}
         selected={card.id == selectedCard?.id}

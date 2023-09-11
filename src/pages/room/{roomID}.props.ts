@@ -18,7 +18,7 @@ export default async function getServerSideProps(req: Request, res: Response) {
 
     const hand = getUserHand(userID, room);
     const state = getUserState(userID, room);
-    const playability = await getPlayability(userID, room);
+    const playability = getPlayability(userID, room);
 
     return {
       props: {

@@ -1,11 +1,10 @@
 import { getUserPlayer } from "@/lib/models/Room";
-import { PlayabilityResult } from "@/lib/tic/types/PlayabilityResult";
+import { CardPlayabilityMap, PlayabilityResult } from "@/lib/tic/types/PlayabilityResult";
 import { TicCard } from "@/lib/tic/types/TicCard";
 import { TicGameState } from "@/lib/tic/types/TicGameState";
 import { TicMarble } from "@/lib/tic/types/TicMarble";
 import { v4 } from "uuid";
 import type { IRoom } from '@/lib/models/Room';
-import { t } from "@/lib/i18next.config";
 
 function generateMarbles(player: number, color: string): TicMarble[] {
   return [
@@ -29,24 +28,24 @@ export function generateNewGame(): TicGameState {
   return {
     deck: [],
     hands: [[
-      { id: 1, type: 'enter', value: 1 },
-      // { id: 2, type: 'number', value: 2 },
-      // { id: 3, type: 'number', value: 3 },
-      { id: 4, type: 'backwards', value: 4 },
-      // { id: 5, type: 'number', value: 5 },
-      { id: 6, type: 'number', value: 6 },
-      { id: 7, type: 'split', value: 7 },
-      { id: 8, type: 'skip', value: 8 },
-      // { id: 9, type: 'number', value: 9 },
-      // { id: 10, type: 'number', value: 10 },
-      // { id: 11, type: 'number', value: 12 },
-      { id: 12, type: 'enter', value: 13 },
-      { id: 13, type: 'swap' },
-      { id: 14, type: 'undo' },
-      { id: 15, type: 'mindcontrol' },
-      { id: 16, type: 'first_aid' },
-      { id: 17, type: 'dash_attack' },
-      { id: 18, type: 'rotate' },
+      { id: v4(), type: 'enter', value: 1 },
+      // { id: v4(), type: 'number', value: 2 },
+      // { id: v4(), type: 'number', value: 3 },
+      { id: v4(), type: 'backwards', value: 4 },
+      // { id: v4(), type: 'number', value: 5 },
+      { id: v4(), type: 'number', value: 6 },
+      { id: v4(), type: 'split', value: 7 },
+      { id: v4(), type: 'skip', value: 8 },
+      // { id: v4(), type: 'number', value: 9 },
+      // { id: v4(), type: 'number', value: 10 },
+      // { id: v4(), type: 'number', value: 12 },
+      { id: v4(), type: 'enter', value: 13 },
+      { id: v4(), type: 'swap' },
+      { id: v4(), type: 'undo' },
+      { id: v4(), type: 'mindcontrol' },
+      { id: v4(), type: 'first_aid' },
+      { id: v4(), type: 'dash_attack' },
+      { id: v4(), type: 'rotate' },
     ], [], [], []],
     board: {
       homes: [
@@ -214,8 +213,7 @@ function canMoveMarbleIntoGoal(marble: TicMarble, amount: number, state: TicGame
   return marbleInGoalBetween(0, stepsInsideGoal - 1, state.board.goals[player]);
 }
 
-export async function getPlayability(userID: string, room: IRoom) {
-  // await i18next.init({});
+export function getPlayability(userID: string, room: IRoom): CardPlayabilityMap {
   const player = getUserPlayer(userID, room);
   const state = room.state;
 
@@ -229,36 +227,22 @@ export async function getPlayability(userID: string, room: IRoom) {
   const marbleInGoal = marbles.some(m => m.meta?.done);
   const marbleInPlayingArea = marbles.some(m => !m.meta?.done && !m.meta?.home);
   const marbleInStartArea = marbles.some(m => m.meta?.home);
-
   const marblesInPlayingArea = state.board.field.filter(f => !!f).length;
 
-  // JSONObject cardData = new JSONObject();
-  // JSONArray responseCards = new JSONArray();
-  // cardData.put("action", "playability");
-  // cardData.put("cards", responseCards);
-
-  // JSONObject undoCard = null;
   const undoCard = state.undoBuffer?.center;
-
-  // if (this.undoState.has("card")) {
-  //   undoCard = new JSONObject();
-  //   undoCard.put("value", this.undoState.getInt("card"));
-  //   undoCard.put("type", new TicCard(undoCard.getInt("value")).type);
-  //   if (undoCard.getString("type").equals("undo")) undoCard = null;
-  // }
 
   const playabilityMap: { [key in TicCard['type']]: (value: number) => PlayabilityResult } = {
     number: (value) => {
       if (!marbleInPlayingArea) { //You need a marble in play to play a number card
         return {
           playable: false,
-          reasons: [t("You do not have a marble in play")]
+          reasons: ["You do not have a marble in play", "None of your marbles can move {{value}} spaces"]
         };
       }
       if (!canMarblesMove(marbles, value, state)) { // Marbles need to be able to move the amount of spaces
         return {
           playable: false,
-          reasons: [t("None of your marbles can move {{value}} spaces", { value })]
+          reasons: [`None of your marbles can move {{value}} ${value > 1 ? 'spaces' : 'space'}`]
         };
       }
       return {
@@ -269,7 +253,7 @@ export async function getPlayability(userID: string, room: IRoom) {
       if (!marbleInPlayingArea && !marbleInGoal) { // you need a marble in play or in the goal to play a split card
         return {
           playable: false,
-          reasons: [t("You do not have a marble in play")]
+          reasons: ["You do not have a marble in play"]
         };
       }
       return {
@@ -280,7 +264,7 @@ export async function getPlayability(userID: string, room: IRoom) {
       if (!marbleInStartArea) { //without a marble to enter, the enter card is the same as a number
         const playability = playabilityMap['number'](value);
         if (!playability.playable) {
-          playability.reasons.unshift(t("You do not have any marbles left that could enter"));
+          playability.reasons.unshift("You do not have any marbles left that could enter");
         }
         return playability;
       }
@@ -295,7 +279,7 @@ export async function getPlayability(userID: string, room: IRoom) {
       if (!marbleInPlayingArea) { //You need a marble in play to play a number card
         return {
           playable: false,
-          reasons: [t("You do not have a marble in play")]
+          reasons: ["You do not have a marble in play"]
         };
       }
       return {
@@ -316,7 +300,7 @@ export async function getPlayability(userID: string, room: IRoom) {
       if (!marbleInPlayingArea) { //You need a marble in play to play a number card
         return {
           playable: false,
-          reasons: [t("You do not have a marble in play")]
+          reasons: ["You do not have a marble in play"]
         };
       }
       return {
@@ -332,13 +316,13 @@ export async function getPlayability(userID: string, room: IRoom) {
       if (!marbleInPlayingArea) { //You need a marble in play to play a number card
         return {
           playable: false,
-          reasons: [t("You do not have a marble in play")]
+          reasons: ["You do not have a marble in play"]
         };
       }
       if (marblesInPlayingArea < 2) {
         return {
           playable: false,
-          reasons: [t("There need to be at least 2 marbles in order to swap them")]
+          reasons: ["There need to be at least 2 marbles in order to swap them"]
         };
       }
       return {
@@ -349,15 +333,18 @@ export async function getPlayability(userID: string, room: IRoom) {
       if (!undoCard) {
         return {
           playable: false,
-          reasons: [t("There is no card to Undo")]
+          reasons: ["There is no card to Undo"]
         };
       }
       return playabilityMap[undoCard.type](undoCard.value ?? -1);
     }
   };
 
-  const playability: PlayabilityResult[] = state.hands[player]
-    .map(({ type, value }) => playabilityMap[type](value ?? -1));
+  const playability: CardPlayabilityMap = state.hands[player]
+    .map(({ type, value, id }) => ({
+      id,
+      playability: playabilityMap[type](value ?? -1)
+    })).reduce<CardPlayabilityMap>((prev, cur) => { prev[cur.id] = cur.playability; return prev; }, {});
 
   return playability;
-}
+};

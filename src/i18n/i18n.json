@@ -7,5 +7,20 @@
   },
   "Close": {
     "de": "Schließen"
+  },
+  "You can not play this card for the following reasons": {
+    "de": "Du kannst diese Karte aus den folgenden Gründen derzeit nicht spielen"
+  },
+  "You do not have a marble in play": {
+    "de": "Du hast keine Murmel im Spiel"
+  },
+  "None of your marbles can move {{value}} spaces": {
+    "de": "Keine deiner Kugeln kann sich {{value}} Felder bewegen"
+  },
+  "None of your marbles can move {{value}} space": {
+    "de": "Keine deiner Kugeln kann sich {{value}} Feld bewegen"
+  },
+  "There is no card to Undo": {
+    "de": "Es gibt keine Karte die rückgängig gemacht werden kann"
   }
 }

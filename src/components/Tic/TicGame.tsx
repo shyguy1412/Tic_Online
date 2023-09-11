@@ -5,26 +5,12 @@ import { TicCard } from "@/lib/tic/types/TicCard";
 import { TicPlayerState } from "@/lib/tic/types/TicPlayerState";
 import { h } from "preact";
 
-type Props = {
-  board?: TicBoardState;
-  hand?: TicCard[];
-  state?: TicPlayerState;
-};
+type Props = {};
 
-export function TicGame({ board, hand, state }: Props) {
+export function TicGame({ }: Props) {
   return <div className="tic-game-wrapper">
-    <TicBoard
-      board={board ?? {
-        homes: [],
-        field: [],
-        goals: [],
-        center: undefined
-      }}
-    ></TicBoard>
+    <TicBoard></TicBoard>
 
-    <TicHand
-      cards={hand ?? []}
-      state={state ?? { type: 'wait' }}
-    ></TicHand>
+    <TicHand></TicHand>
   </div>;
 }

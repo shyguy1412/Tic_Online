@@ -55,11 +55,11 @@ async function _post(req: Request, res: Response) {
   room.state.board.center = req.body;
   // room.state.hands[user.player] = hand;
 
-  user.state = {
-    type: 'play',
-    card: req.body,
-    meta: getInitialMetaInfo(req.body)
-  };
+  // user.state = {
+  //   type: 'play',
+  //   card: req.body,
+  //   meta: getInitialMetaInfo(req.body)
+  // };
 
   await room.save();
   TicEventManager.emit(`update_room_${roomID}`);

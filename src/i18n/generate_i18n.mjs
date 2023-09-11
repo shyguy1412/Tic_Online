@@ -14,10 +14,10 @@ for (const [english, translations] of Object.entries(i18n)) {
   }
 }
 
-if (!existsSync('./src/i18n/generated/')) {
-  await mkdir('./src/i18n/generated/');
+if (!existsSync('./src/public/i18n/')) {
+  await mkdir('./src/public/i18n/');
 }
 
 for (const key in output) {
-  await writeFile(`./src/i18n/generated/${key}.json`, JSON.stringify(output[key]));
+  await writeFile(`./src/public/i18n/${key}.json`, JSON.stringify(output[key], null, 2));
 }
