@@ -49,14 +49,14 @@ const CardCSSClassList: { [key in TicCard['type']]: string[] } = {
 
 export function TicCardDisplay({ card, selected }: Props) {
 
-  const [handManagerState, handManagerAction] = useContext(HandContext) ?? [];
+  const [_, handManagerAction] = useContext(HandContext) ?? [];
 
-  if (!handManagerAction || !handManagerState) throw new Error("No HandManager instance");
 
   const CardComponent = CardComponents[card.type];
 
   return <div
     onClick={() => {
+      if (!handManagerAction) return;
       handManagerAction({
         action: 'select-card',
         data: card
@@ -68,15 +68,19 @@ export function TicCardDisplay({ card, selected }: Props) {
       selected ?
         <div className="tic-confirm-card">
           <span
-            onClick={() => handManagerAction({
-              action: 'play-card',
-              data: card
-            })}
+            onClick={() => {
+              if (!handManagerAction) throw new Error("No HandManager instance");
+              handManagerAction({
+                action: 'play-card',
+                data: card
+              });
+            }}
             className="option-confirm">
             <FontAwesomeIcon icon={faCheck}></FontAwesomeIcon>
           </span>
           <span
             onClick={(e) => {
+              if (!handManagerAction) throw new Error("No HandManager instance");
               handManagerAction({
                 action: 'select-card',
                 data: null

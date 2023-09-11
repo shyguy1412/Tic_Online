@@ -48,7 +48,11 @@ async function _post(req: Request, res: Response) {
     roomID,
     users: [{
       name: req.body.username,
-      userID
+      userID,
+      player: 0,
+      state: {
+        type: 'choose'
+      }
     }],
     state: generateNewGame()
   });

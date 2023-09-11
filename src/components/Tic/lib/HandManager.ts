@@ -38,6 +38,9 @@ const ActionHandler: HandManagerActionHandlerMap = {
   "play-card": function (state: HandManagerState, { action, data }: HandManagerDispatch<"play-card">): HandManagerState {
     fetch(`${API_PREFIX}/play`, {
       method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(data)
     });
 

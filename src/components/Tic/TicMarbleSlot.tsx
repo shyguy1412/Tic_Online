@@ -2,7 +2,7 @@ import { TicMarble } from "@/lib/tic/types/TicMarble";
 import { h } from "preact";
 
 type Props = {
-  marble?: TicMarble;
+  marble: TicMarble | null;
   index?: number;
 };
 

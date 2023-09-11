@@ -6,18 +6,35 @@ import { TicGame } from '@/components/Tic/TicGame';
 
 import '@/style/roomID.css';
 import '@/style/fullscreen.css';
+import { useServerSentEvents } from 'squid-ssr/hooks';
+import config from '@/config';
+import { useState } from 'preact/hooks';
 
-export default function App({ state }: ServerSideProps) {
+const {
+  API_PREFIX
+} = config;
 
+export default function App({ board: initialBoard, hand: initialHand, roomID, state: initialState, playability }: ServerSideProps) {
 
-  // const sse = useServerSentEvents('/api/v0/room/sse');
+  const [board, setBoard] = useState(initialBoard);
+  const [hand, setHand] = useState(initialHand);
+  const [state, setState] = useState(initialState);
 
-  // sse.addEventListener('test', ({ detail: data }) => {
-  //   console.log(data);
+  const sse = useServerSentEvents(`${API_PREFIX}/${roomID}`);
 
-  // });
+  sse.addEventListener('board', ({ detail: data }) => {
+    setBoard(data);
+  });
 
-  console.log(state);
+  sse.addEventListener('hand', ({ detail: data }) => {
+    setHand(data);
+  });
+
+  sse.addEventListener('state', ({ detail: data }) => {
+    setState(data);
+  });
+
+  console.log(playability);
 
   return <>
     <Document>
@@ -25,7 +42,7 @@ export default function App({ state }: ServerSideProps) {
         <title>Tic Online</title>
       </Head>
 
-      <TicGame state={state} ></TicGame>
+      <TicGame board={board} hand={hand} state={state}></TicGame>
 
     </Document>
   </>;

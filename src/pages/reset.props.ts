@@ -1,13 +1,15 @@
 import { Request, Response } from 'express';
 import { useCookies } from 'squid-ssr/hooks';
 
-export default function getServerSideProps(req: Request, res: Response) {
+export default async function getServerSideProps(req: Request, res: Response) {
 
   const cookies = useCookies(req, res);
 
+  cookies.remove('tic_room');
+
   return {
     props: {},
-    redirect: cookies['tic_room'] ? `/room/${cookies['tic_room'].roomID}` : undefined
+    redirect: '/'
   };
 }
 

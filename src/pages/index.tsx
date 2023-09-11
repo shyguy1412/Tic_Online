@@ -2,8 +2,9 @@ import { ServerSideProps } from '@/pages/index.props';
 import { h, Fragment } from 'preact';
 import { Document } from '@/components/Document';
 import { Head } from '@/components/Head';
+import config from '@/config';
 
-const { API_PREFIX } = process.env;
+const { API_PREFIX } = config;
 
 export default function App({ }: ServerSideProps) {
 

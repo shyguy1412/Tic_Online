@@ -25,7 +25,7 @@
   cursor: pointer;
 }
 
-.tic-hand {
+.tic-hand, .tic-center {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;

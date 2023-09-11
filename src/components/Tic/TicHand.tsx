@@ -4,17 +4,19 @@ import { TicCard } from "@/lib/tic/types/TicCard";
 import { createContext } from "preact";
 import { h } from "preact";
 import { useReducer } from "preact/hooks";
+import { TicPlayerState } from "@/lib/tic/types/TicPlayerState";
 
 type Props = {
   cards: TicCard[];
+  state: TicPlayerState;
 };
 
 export const HandContext = createContext<HandManager | null>(null);
 
-export function TicHand({ cards }: Props) {
+export function TicHand({ cards, state }: Props) {
 
   const HandManager = useReducer(HandManagerReducer, {
-    cardsActive: true,
+    cardsActive: state.type == 'choose',
     selectedCard: null
   });
 

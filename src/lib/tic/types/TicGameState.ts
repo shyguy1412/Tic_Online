@@ -5,5 +5,6 @@ export type TicGameState = {
   deck: TicCard[],
   currentPlayer: number,
   hands: [TicCard[], TicCard[], TicCard[], TicCard[]];
-  board: TicBoardState
+  board: TicBoardState,
+  undoBuffer?: TicBoardState
 };

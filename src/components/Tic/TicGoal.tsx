@@ -3,7 +3,7 @@ import { TicMarble } from "@/lib/tic/types/TicMarble";
 import { h } from "preact";
 
 type Props = {
-  marbles: TicMarble[];
+  marbles: (TicMarble|null)[];
 };
 
 export function TicGoal({ marbles }: Props) {

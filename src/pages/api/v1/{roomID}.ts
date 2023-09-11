@@ -1,7 +1,8 @@
 import type { Request, Response } from 'express';
-import { createServerSentEventStream } from 'squid-ssr/hooks';
-import { Room } from '@/lib/models/Room';
+import { createServerSentEventStream, useCookies } from 'squid-ssr/hooks';
+import { getUserHand, Room } from '@/lib/models/Room';
 import { connectToDatabase } from '@/lib/mongoose';
+import { TicEventManager } from '@/lib/tic/TicEventManager';
 
 const methods = {
   GET: (req: Request, res: Response) => _get(req, res),
@@ -23,11 +24,23 @@ export default async function handler(req: Request, res: Response) {
 }
 
 async function _get(req: Request, res: Response) {
+  const { roomID } = req.params;
   const sseStream = createServerSentEventStream(req, res);
 
-  sseStream.dispatch('test', { fancy: 'data' });
-  sseStream.close();
-  Room.find();
+  const cookies = useCookies(req, res);
+
+  const { userID } = cookies['tic_room'];
+
+  const listener = async () => {
+    const room = await Room.findOne({ roomID });
+    if (!room) return sseStream.close();
+    sseStream.send('board', room.state.board);
+    sseStream.send('hand', getUserHand(userID, room));
+  };
+
+  TicEventManager.addListener(`update_room_${roomID}`, listener);
+
+  sseStream.addEventListener('close', () => TicEventManager.removeListener(`update_room_${roomID}`, listener));
 }
 
 async function _post(req: Request, res: Response) {
