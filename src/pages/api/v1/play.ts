@@ -1,5 +1,5 @@
 import { getUser, getUserHand, getUserPlayer, Room } from '@/lib/models/Room';
-import { getInitialMetaInfo } from '@/lib/tic/GameLogic';
+import { getInitialMetaInfo, getPlayability } from '@/lib/tic/GameLogic';
 import { TicEventManager } from '@/lib/tic/TicEventManager';
 import { TicCard } from '@/lib/tic/types/TicCard';
 import type { Request, Response } from 'express';
@@ -50,19 +50,27 @@ async function _post(req: Request, res: Response) {
 
   const user = getUser(userID, room);
   if (!user) return res.status(500).send('Internal Server Error');
-  const hand = getUserHand(userID, room).filter(c => c.id != req.body.id);
+  const hand = getUserHand(userID, room);
+  const card = hand.find(c => c.id == req.body.id);
+
+  if (!card || !getPlayability(userID, room, card)[card.id]?.playable) {
+    return res.status(400).send('Invalid Card');
+  }
 
   room.state.board.center = req.body;
-  // room.state.hands[user.player] = hand;
+  room.state.hands[user.player] = hand.filter(c => c.id != req.body.id);
 
-  // user.state = {
-  //   type: 'play',
-  //   card: req.body,
-  //   meta: getInitialMetaInfo(req.body)
-  // };
+  user.state = {
+    type: 'play',
+    card: req.body,
+    meta: getInitialMetaInfo(req.body)
+  };
 
   await room.save();
-  TicEventManager.emit(`update_room_${roomID}`);
+
+  TicEventManager.emit(`${roomID}:board`);
+  TicEventManager.emit(`${roomID}:${userID}:hand`);
+  TicEventManager.emit(`${roomID}:${userID}:state`);
   res.status(201).send();
   // res.status(400).send('Method does not exist for this route');
 }

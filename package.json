@@ -34,7 +34,7 @@
     "preact": "^10.17.1",
     "preact-render-to-string": "^6.2.1",
     "react-i18next": "^13.2.2",
-    "squid-ssr": "file:../../TypeScript/Squid",
+    "squid-ssr": "file:squid-ssr-0.0.1.tgz",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

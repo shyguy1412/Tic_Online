@@ -1,8 +1,9 @@
 import type { Request, Response } from 'express';
 import { createServerSentEventStream, useCookies } from 'squid-ssr/hooks';
-import { getUserHand, Room } from '@/lib/models/Room';
+import { getUserHand, getUserState, Room } from '@/lib/models/Room';
 import { connectToDatabase } from '@/lib/mongoose';
 import { TicEventManager } from '@/lib/tic/TicEventManager';
+import { getPlayability } from '@/lib/tic/GameLogic';
 
 const methods = {
   GET: (req: Request, res: Response) => _get(req, res),
@@ -30,17 +31,32 @@ async function _get(req: Request, res: Response) {
   const cookies = useCookies(req, res);
 
   const { userID } = cookies['tic_room'];
+  // const room = await Room.findOne({ roomID });
 
-  const listener = async () => {
+  // if (!room) return res.status(400).send('Invalid Room');
+
+  const getRoom = async () => {
     const room = await Room.findOne({ roomID });
-    if (!room) return sseStream.close();
-    sseStream.send('board', room.state.board);
-    sseStream.send('hand', getUserHand(userID, room));
+    if (!room) throw new Error('Invalid Room');
+    return room;
   };
 
-  TicEventManager.addListener(`update_room_${roomID}`, listener);
+  const sendState = async () => sseStream.send('state', getUserState(userID, (await getRoom())));
+  const sendBoard = async () => sseStream.send('board', (await getRoom()).state.board);
+  const sendHand = async () => sseStream.send('hand', getUserHand(userID, (await getRoom())));
+  const sendPlayability = async () => sseStream.send('hand', getPlayability(userID, (await getRoom())));
 
-  sseStream.addEventListener('close', () => TicEventManager.removeListener(`update_room_${roomID}`, listener));
+  TicEventManager.addListener(`${roomID}:board`, sendBoard);
+  TicEventManager.addListener(`${roomID}:${userID}:hand`, sendHand);
+  TicEventManager.addListener(`${roomID}:${userID}:state`, sendState);
+  TicEventManager.addListener(`${roomID}:${userID}:playability`, sendPlayability);
+
+  sseStream.addEventListener('close', () => {
+    TicEventManager.removeListener(`${roomID}:board`, sendBoard);
+    TicEventManager.removeListener(`${roomID}:${userID}:hand`, sendHand);
+    TicEventManager.removeListener(`${roomID}:${userID}:state`, sendState);
+    TicEventManager.removeListener(`${roomID}:${userID}:playability`, sendPlayability);
+  });
 }
 
 async function _post(req: Request, res: Response) {

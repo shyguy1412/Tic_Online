@@ -1,13 +1,13 @@
 import { Modal } from "@/components/Modal";
-import { HandContext } from "@/components/Tic/TicHand";
 import { PlayabilityResult } from "@/lib/tic/types/PlayabilityResult";
 import { TicCard } from "@/lib/tic/types/TicCard";
-import { TicGameStateContext } from "@/pages/room/{roomID}";
 import { faBolt, faBrain, faCheck, faHandHoldingMedical, faQuestion, faRotateLeft, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FunctionComponent, h } from "preact";
 import { useContext, useState } from "preact/hooks";
 import { useTranslation } from "react-i18next";
+import { GameManagerContext } from "@/components/Tic/TicGame";
+
 
 type Props = {
   card: TicCard;
@@ -53,18 +53,19 @@ const CardCSSClassList: { [key in TicCard['type']]: string[] } = {
 
 export function TicCardDisplay({ card, selected }: Props) {
 
-  const game = useContext(TicGameStateContext);
-  const [_, handManagerAction] = useContext(HandContext) ?? [];
+  const [GameState, gameManagerAction] = useContext(GameManagerContext);
 
-  const playability: PlayabilityResult = game?.playability ? game.playability[card.id] : { playable: false, reasons: [''] };
+  const playability: PlayabilityResult = GameState?.playability && GameState?.board?.center?.id != card.id ? GameState.playability[card.id] : { playable: false, reasons: [''] };
 
   const CardComponent = CardComponents[card.type];
+  const cardsActive = GameState?.cardsActive;
 
   return <div
     onClick={() => {
-      if (!handManagerAction) return;
+      if (!gameManagerAction) return;
+      if (!cardsActive) return;
       if (!playability.playable) return;
-      handManagerAction({
+      gameManagerAction({
         action: 'select-card',
         data: card
       });
@@ -73,16 +74,16 @@ export function TicCardDisplay({ card, selected }: Props) {
       "tic-card",
       ...CardCSSClassList[card.type],
       selected ? 'tic-card-selected' : '',
-      playability.playable ? '' : 'tic-card-unplayable'
+      (GameState?.board?.center?.id == card.id || playability.playable) && cardsActive ? '' : 'tic-card-unplayable'
     ].join(' ')}>
     <HelpModal card={card} reasons={playability.playable ? [] : playability.reasons}></HelpModal>
     {
       selected ?
         <div className="tic-confirm-card">
           <span
-            onClick={() => {
-              if (!handManagerAction) throw new Error("No HandManager instance");
-              handManagerAction({
+            onClick={async () => {
+              if (!gameManagerAction) throw new Error("No HandManager instance");
+              gameManagerAction({
                 action: 'play-card',
                 data: card
               });
@@ -92,8 +93,8 @@ export function TicCardDisplay({ card, selected }: Props) {
           </span>
           <span
             onClick={(e) => {
-              if (!handManagerAction) throw new Error("No HandManager instance");
-              handManagerAction({
+              if (!gameManagerAction) throw new Error("No HandManager instance");
+              gameManagerAction({
                 action: 'select-card',
                 data: null
               });
@@ -112,7 +113,8 @@ export function TicCardDisplay({ card, selected }: Props) {
 function HelpModal({ reasons, card }: HelpModalProps) {
   const [open, setOpen] = useState(false);
 
-  const { t, i18n } = useTranslation();
+  const [GameState] = useContext(GameManagerContext);
+  const { t } = useTranslation();
 
   return <div
     onClick={(e) => {
@@ -123,7 +125,7 @@ function HelpModal({ reasons, card }: HelpModalProps) {
     <FontAwesomeIcon icon={faQuestion}></FontAwesomeIcon>
     <Modal open={open} onClose={() => setOpen(false)}>
       {
-        !reasons.length || <div>{t("You can not play this card for the following reasons")}: <br />
+        (!reasons.length || GameState?.board?.center?.id == card.id) || <div>{t("You can not play this card for the following reasons")}: <br />
           {
             reasons.map((s, i) => <div key={i}>{t(s, { value: card.value })}</div>)
           }

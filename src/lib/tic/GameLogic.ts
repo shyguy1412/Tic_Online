@@ -213,7 +213,7 @@ function canMoveMarbleIntoGoal(marble: TicMarble, amount: number, state: TicGame
   return marbleInGoalBetween(0, stepsInsideGoal - 1, state.board.goals[player]);
 }
 
-export function getPlayability(userID: string, room: IRoom): CardPlayabilityMap {
+export function getPlayability(userID: string, room: IRoom, card?: TicCard): CardPlayabilityMap {
   const player = getUserPlayer(userID, room);
   const state = room.state;
 
@@ -236,7 +236,7 @@ export function getPlayability(userID: string, room: IRoom): CardPlayabilityMap 
       if (!marbleInPlayingArea) { //You need a marble in play to play a number card
         return {
           playable: false,
-          reasons: ["You do not have a marble in play", "None of your marbles can move {{value}} spaces"]
+          reasons: ["You do not have a marble in play"]
         };
       }
       if (!canMarblesMove(marbles, value, state)) { // Marbles need to be able to move the amount of spaces
@@ -340,7 +340,7 @@ export function getPlayability(userID: string, room: IRoom): CardPlayabilityMap 
     }
   };
 
-  const playability: CardPlayabilityMap = state.hands[player]
+  const playability: CardPlayabilityMap = (card ? [card] : state.hands[player])
     .map(({ type, value, id }) => ({
       id,
       playability: playabilityMap[type](value ?? -1)

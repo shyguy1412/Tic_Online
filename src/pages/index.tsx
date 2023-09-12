@@ -14,7 +14,7 @@ export default function App({ }: ServerSideProps) {
         <title>Tic Online</title>
       </Head>
       <form action={`${API_PREFIX}/room`} method="POST">
-        <input name="username" required={true} type="text" />
+        <input name="username" required={true} type="text" value={"Nils"} />
         <button>Create new room</button>
       </form>
     </Document>
