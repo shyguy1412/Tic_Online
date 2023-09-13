@@ -26,14 +26,11 @@ export default async function handler(req: Request, res: Response) {
 
 async function _get(req: Request, res: Response) {
   const { roomID } = req.params;
-  const sseStream = createServerSentEventStream(req, res);
-
   const cookies = useCookies(req, res);
-
+  if (!cookies['tic_room']) return res.status(401).send('Expired Session');
   const { userID } = cookies['tic_room'];
-  // const room = await Room.findOne({ roomID });
 
-  // if (!room) return res.status(400).send('Invalid Room');
+  const sseStream = createServerSentEventStream(req, res);
 
   const getRoom = async () => {
     const room = await Room.findOne({ roomID });
@@ -44,7 +41,7 @@ async function _get(req: Request, res: Response) {
   const sendState = async () => sseStream.send('state', getUserState(userID, (await getRoom())));
   const sendBoard = async () => sseStream.send('board', (await getRoom()).state.board);
   const sendHand = async () => sseStream.send('hand', getUserHand(userID, (await getRoom())));
-  const sendPlayability = async () => sseStream.send('hand', getPlayability(userID, (await getRoom())));
+  const sendPlayability = async () => sseStream.send('playability', getPlayability(userID, (await getRoom())));
 
   TicEventManager.addListener(`${roomID}:board`, sendBoard);
   TicEventManager.addListener(`${roomID}:${userID}:hand`, sendHand);

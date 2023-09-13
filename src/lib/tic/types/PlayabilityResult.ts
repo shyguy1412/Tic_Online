@@ -3,6 +3,7 @@ export type PlayabilityResult = ({
   reasons: string[];
 } | {
   playable: true;
+  marbles: string[]
 });
 
 export type CardPlayabilityMap = {

@@ -1,3 +1,5 @@
+import 'preact/debug';
+
 import type { ServerSideProps } from '@/pages/room/{roomID}.props';
 import { h, Fragment } from 'preact';
 import { Document } from '@/components/Document';
@@ -17,8 +19,8 @@ export default function App({ roomID, board, hand, state, playability }: ServerS
       </Head>
 
       <a style={{
-        position:'absolute',
-        left:'50%',
+        position: 'absolute',
+        left: '50%',
         transform: 'translate(-50%)'
       }} href="/reset">
         <h1>RESET</h1>

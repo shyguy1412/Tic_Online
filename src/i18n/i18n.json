@@ -22,5 +22,8 @@
   },
   "There is no card to Undo": {
     "de": "Es gibt keine Karte die rückgängig gemacht werden kann"
+  },
+  "There need to be at least 2 marbles in play in order to swap them":{
+    "de": "Es müssen mindestens 2 Murmeln im Spiel sein um sie zu tauschen"
   }
 }

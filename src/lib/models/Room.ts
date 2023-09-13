@@ -32,6 +32,10 @@ const RoomSchema = new mongoose.Schema<IRoom>({
       meta: {
         type: Object,
         required: false
+      },
+      validMarbles: {
+        type: Object,
+        required: false
       }
     }
   }],

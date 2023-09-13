@@ -31,11 +31,11 @@
 }
 
 @media screen and (orientation:portrait) {
-  .tic-game-wrapper{
+  .tic-game-wrapper {
     flex-direction: column
   }
 
-  .tic-hand{
+  .tic-hand {
     flex-direction: row;
   }
 }
@@ -98,7 +98,6 @@
 .tic-goal-wrapper {
   position: absolute;
   display: grid;
-
 
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
@@ -166,6 +165,10 @@
   height: calc(var(--board-size) * var(--marble-size));
 }
 
+.tic-marble-selectable{
+  border-color: white;
+}
+
 .tic-marble-slot:hover {
   background-color: rgba(255, 255, 255, var(--marble-slot-opacity));
   filter: brightness(80%);
@@ -181,6 +184,6 @@
 .tic-fields>.tic-marble-slot {
   position: absolute;
 
-  left: calc((var(--board-size)/2) + ((var(--board-size)*var(--fields-radius)) * cos((var(--marble-index)/60) * (2*var(--PI))) - (var(--board-size) * var(--marble-size))/2));
-  top: calc((var(--board-size)/2) + ((var(--board-size)*var(--fields-radius)) * sin((var(--marble-index)/60) * (2*var(--PI))) - (var(--board-size) * var(--marble-size))/2));
+  left: calc((var(--board-size)/2) + ((var(--board-size)*var(--fields-radius)) * cos((var(--marble-index)/60) * (2*var(--PI)) - (var(--PI)/2)) - (var(--board-size) * var(--marble-size))/2));
+  top: calc((var(--board-size)/2) + ((var(--board-size)*var(--fields-radius)) * sin((var(--marble-index)/60) * (2*var(--PI)) - (var(--PI)/2)) - (var(--board-size) * var(--marble-size))/2));
 }

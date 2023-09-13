@@ -3,6 +3,7 @@ import { TicBoardState } from "@/lib/tic/types/TicBoardState";
 import { TicCard } from "@/lib/tic/types/TicCard";
 import { TicPlayerState } from "@/lib/tic/types/TicPlayerState";
 import config from "@/config";
+import { TicMarble } from "@/lib/tic/types/TicMarble";
 
 const {
   API_PREFIX
@@ -28,6 +29,8 @@ export type GameManagerAction =
   'set-state' |
   'set-board' |
   'set-playability' |
+  'select-marble' |
+  'play-marble' |
   // 'activate-cards' |
   'init';
 
@@ -39,8 +42,10 @@ export interface GameManagerDispatch<T extends GameManagerAction = GameManagerAc
   : T extends 'init' ? GameManager
   : T extends 'set-hand' ? GameManagerState['hand']
   : T extends 'set-state' ? GameManagerState['state']
-  : T extends 'set-board' ? GameManagerState['board']
+  : T extends 'set-board' ? (GameManagerState['board'] & {'source':string})
   : T extends 'set-playability' ? GameManagerState['playability']
+  : T extends 'select-marble' ? TicMarble
+  : T extends 'play-marble' ? TicMarble
   : never;
 };
 
@@ -60,6 +65,8 @@ const ActionHandler: GameManagerActionHandlerMap = {
   "play-card": function (state: GameManagerState, { action, data }: GameManagerDispatch<"play-card">): GameManagerState {
     if (!state.self)
       throw new Error("GameManager is not initilized");
+
+    //! Handle invalid fetch
 
     fetch(`${API_PREFIX}/play`, {
       method: 'POST',
@@ -92,10 +99,13 @@ const ActionHandler: GameManagerActionHandlerMap = {
   "set-state": function (state: GameManagerState, { action, data }: GameManagerDispatch<"set-state">): GameManagerState {
     return {
       ...state,
-      state: data
+      state: data,
+      cardsActive: data?.type == 'choose'
     };
   },
   "set-board": function (state: GameManagerState, { action, data }: GameManagerDispatch<"set-board">): GameManagerState {
+    console.log(data.source);
+    
     return {
       ...state,
       board: data
@@ -106,6 +116,37 @@ const ActionHandler: GameManagerActionHandlerMap = {
       ...state,
       playability: data
     };
+  },
+  "select-marble": function (state: GameManagerState, { action, data }: GameManagerDispatch<"select-marble">): GameManagerState {
+    // return selectMove(data, state);
+
+    fetch(`${API_PREFIX}/preview`, {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data)
+    })
+      .then(res => res.json())
+      .then(preview => state.self!({
+        action: 'set-board',
+        data: {...preview, source:'preview'},
+      }))
+      .catch(_ => console.warn(_));
+
+
+    return state;
+  },
+  "play-marble": function (state: GameManagerState, { action, data }: GameManagerDispatch<"play-marble">): GameManagerState {
+
+    fetch(`${API_PREFIX}/play`, {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data)
+    });
+    return state;
   }
 };
 

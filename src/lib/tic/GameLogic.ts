@@ -49,16 +49,16 @@ export function generateNewGame(): TicGameState {
     ], [], [], []],
     board: {
       homes: [
-        generateMarbles(1, '#ff0000'),
-        generateMarbles(2, '#00ff00'),
-        generateMarbles(3, '#0000ff'),
-        generateMarbles(4, '#ffff00'),
+        generateMarbles(0, '#ff0000'),
+        generateMarbles(1, '#00ff00'),
+        generateMarbles(2, '#0000ff'),
+        generateMarbles(3, '#ffff00'),
       ],
       goals: [generateSlots(4), generateSlots(4), generateSlots(4), generateSlots(4)],
       field: generateSlots(60),
       center: undefined
     },
-    currentPlayer: 1
+    currentPlayer: 0
   };
 }
 
@@ -118,15 +118,13 @@ function getPlayerMarbles(player: number, state: TicGameState) {
   return marbles;
 }
 
-function canMarblesMove(marbles: TicMarble[], amount: number, state: TicGameState) {
-  const player = marbles[0].player;
-  return marbles.some(m => {
-    if (state.board.homes[player].some(h => h.id == m.id)) return false;
-    const canMoveIntoGoal = canMoveMarbleIntoGoal(m, amount, state);
-    const canMove = canMoveMarbleBy(m, amount, state);
-    const canMoveInGoal = canMoveMarbleInsideGoal(m, amount, state);
-    if (canMove || canMoveIntoGoal || canMoveInGoal) return true;
-  });
+function canMarbleMove(marble: TicMarble, amount: number, state: TicGameState) {
+  const player = marble.player;
+  if (state.board.homes[player].some(h => h.id == marble.id)) return false;
+  const canMoveIntoGoal = canMoveMarbleIntoGoal(marble, amount, state);
+  const canMove = canMoveMarbleBy(marble, amount, state);
+  const canMoveInGoal = canMoveMarbleInsideGoal(marble, amount, state);
+  if (canMove || canMoveIntoGoal || canMoveInGoal) return true;
 };
 
 function canMoveMarbleInsideGoal(marble: TicMarble, amount: number, state: TicGameState) {
@@ -217,7 +215,7 @@ export function getPlayability(userID: string, room: IRoom, card?: TicCard): Car
   const player = getUserPlayer(userID, room);
   const state = room.state;
 
-  let marbles = state.board.goals[player].length < 4 ? //player is not done
+  let marbles = state.board.goals[player].every(m => !m) ? //player is not done
     getPlayerMarbles(player, state) : getPlayerMarbles(getTeammate(player), state);
 
   if (marbles.every(m => m.meta?.done)) {
@@ -239,14 +237,17 @@ export function getPlayability(userID: string, room: IRoom, card?: TicCard): Car
           reasons: ["You do not have a marble in play"]
         };
       }
-      if (!canMarblesMove(marbles, value, state)) { // Marbles need to be able to move the amount of spaces
+      const movableMarbles = marbles.filter(m => canMarbleMove(m, value, state)).map(m => m.id);
+      
+      if (movableMarbles.length == 0) { // Marbles need to be able to move the amount of spaces
         return {
           playable: false,
           reasons: [`None of your marbles can move {{value}} ${value > 1 ? 'spaces' : 'space'}`]
         };
       }
       return {
-        playable: true
+        playable: true,
+        marbles: movableMarbles
       };
     },
     split: (value) => {
@@ -257,43 +258,59 @@ export function getPlayability(userID: string, room: IRoom, card?: TicCard): Car
         };
       }
       return {
-        playable: true
+        playable: true,
+        marbles: [...state.board.field, ...state.board.goals[player]]
+          .filter(m => m && m.player == player)
+          .map(m => m!.id)
       };
     },
     enter: (value) => {
-      if (!marbleInStartArea) { //without a marble to enter, the enter card is the same as a number
-        const playability = playabilityMap['number'](value);
-        if (!playability.playable) {
-          playability.reasons.unshift("You do not have any marbles left that could enter");
-        }
+      const homeMarbles = state.board.homes[player].map(m => m.id);
+      const playability = playabilityMap['number'](value);
+
+      if (!playability.playable && !marbleInStartArea) {
+        playability.reasons.unshift("You do not have any marbles left that could enter");
         return playability;
       }
+
+      const playableMarbles = playability.playable ? playability.marbles : [];
+      playableMarbles.push(...homeMarbles);
+
       return {
-        playable: true
+        playable: true,
+        marbles: playableMarbles
       };
     },
     backwards: (value) => {
       return playabilityMap['number'](value * -1);
     },
     skip: (value) => {
+      const playability = playabilityMap['number'](value);
+
       if (!marbleInPlayingArea) { //You need a marble in play to play a number card
         return {
           playable: false,
           reasons: ["You do not have a marble in play"]
         };
       }
+
+      const playableMarbles = playability.playable ? playability.marbles : [];
+
       return {
-        playable: true
+        playable: true,
+        marbles: playableMarbles
       };
     },
     first_aid: (value) => {
       return {
-        playable: true
+        playable: true,
+        marbles: []
       };
     },
     mindcontrol: (value) => {
       return {
-        playable: true
+        playable: true,
+        marbles: []
       };
     },
     dash_attack: (value) => {
@@ -304,12 +321,14 @@ export function getPlayability(userID: string, room: IRoom, card?: TicCard): Car
         };
       }
       return {
-        playable: true
+        playable: true,
+        marbles: state.board.field.filter(m => m?.player == player).map(m => m!.id)
       };
     },
     rotate: (value) => {
       return {
-        playable: true
+        playable: true,
+        marbles: []
       };
     },
     swap: (value) => {
@@ -322,11 +341,12 @@ export function getPlayability(userID: string, room: IRoom, card?: TicCard): Car
       if (marblesInPlayingArea < 2) {
         return {
           playable: false,
-          reasons: ["There need to be at least 2 marbles in order to swap them"]
+          reasons: ["There need to be at least 2 marbles in play in order to swap them"]
         };
       }
       return {
-        playable: true
+        playable: true,
+        marbles: state.board.field.filter(m => !!m).map(m => m!.id)
       };
     },
     undo: (value) => {

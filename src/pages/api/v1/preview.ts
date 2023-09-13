@@ -1,9 +1,9 @@
+import { Room, getUser } from '@/lib/models/Room';
+import { selectMove } from '@/lib/tic/MoveManager';
+import { TicEventManager } from '@/lib/tic/TicEventManager';
+import { TicMarble } from '@/lib/tic/types/TicMarble';
 import type { Request, Response } from 'express';
 import { useCookies } from 'squid-ssr/hooks';
-import crypto from 'crypto';
-import { Room } from '@/lib/models/Room';
-import { v4 } from 'uuid';
-import { generateNewGame } from '@/lib/tic/GameLogic';
 
 const methods = {
   GET: (req: Request, res: Response) => _get(req, res),
@@ -28,47 +28,31 @@ async function _get(req: Request, res: Response) {
 }
 
 async function _post(req: Request, res: Response) {
-
-  if (!req.body.username || typeof req.body.username != 'string') {
-    return res.status(400).send('Bad Request');
-  }
-
   const cookies = useCookies(req, res);
+  const roomCookie = cookies['tic_room'];
+  if (!roomCookie || typeof roomCookie != 'object') return res.status(401).send('Unauthorized');
 
-  const roomID = crypto
-    .createHash('md5')
-    .update(Date.now() + '')
-    .digest()
-    .toString('hex');
+  const { name, roomID, userID } = roomCookie as { [key: string]: string | undefined; };
 
-  const userID = v4();
+  if (!name || !roomID || !userID)
+    return res.status(400).send('Bad Request');
 
-  const newRoom = await Room.create({
-    roomID,
-    users: [{
-      name: req.body.username,
-      userID,
-      player: 0,
-      state: {
-        type: 'choose'
-      }
-    }],
-    state: generateNewGame()
+  const room = await Room.findOne({
+    roomID
   });
 
-  newRoom.save();
+  if (!room) return res.status(400).send('Expired Room');
 
-  cookies.add({
-    key: 'tic_room',
-    value: {
-      name: req.body.username,
-      userID: userID,
-      roomID: roomID
-    },
-    path: '/'
-  });
 
-  res.redirect(`/room/${roomID}`);
+  const user = getUser(userID, room);
+  if (!user) return res.status(500).send('Internal Server Error');
+
+  const marble: TicMarble = req.body;
+
+  const preview = selectMove(marble, room);
+
+  res.status(200).json(preview);
+  // res.status(400).send('Method does not exist for this route');
 }
 
 async function _put(req: Request, res: Response) {

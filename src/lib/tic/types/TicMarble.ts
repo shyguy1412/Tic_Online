@@ -7,5 +7,6 @@ export interface TicMarble {
     home: boolean;
     done: boolean;
     pos: number;
+    preview: boolean;
   }>;
 }

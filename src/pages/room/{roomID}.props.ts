@@ -31,8 +31,6 @@ export default async function getServerSideProps(req: Request, res: Response) {
     };
 
   } catch (_) {
-    console.log(_);
-
     return {
       props: {
         roomID: req.params.roomID

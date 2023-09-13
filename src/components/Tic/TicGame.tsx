@@ -39,18 +39,15 @@ export function TicGame({ hand, state, board, playability, roomID }: Props) {
 
   useEffect(() => {
     if (!sse) return;
-    console.log('listening');
 
     sse.addEventListener('board', ({ detail: data }) => {
       GameManager[1]({
         action: "set-board",
-        data
+        data: {...data, source:'event'}
       });
     });
 
     sse.addEventListener('hand', ({ detail: data }) => {
-      console.log({data});
-      
       GameManager[1]({
         action: "set-hand",
         data
