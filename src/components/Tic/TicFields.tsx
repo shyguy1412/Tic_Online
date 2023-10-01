@@ -1,3 +1,4 @@
+import { cycleArray } from "@/components/Tic/lib/CycleArray";
 import { GameManagerContext } from "@/components/Tic/TicGame";
 import { TicMarbleSlot } from "@/components/Tic/TicMarbleSlot";
 import { FunctionComponent, h, JSX } from "preact";
@@ -13,7 +14,7 @@ export function TicFields({ }: Props) {
 
   return <div className="tic-fields">
     {
-      GameState?.board?.field.map((m, i) => <TicMarbleSlot marble={m} index={i} key={i}></TicMarbleSlot>)
+      GameState?.board?.field.map((m, i) => <TicMarbleSlot marble={m} index={i + ((((GameState?.player ?? 0) + 2) % 4) * 15)} key={i}></TicMarbleSlot>)
     }
   </div>;
 }

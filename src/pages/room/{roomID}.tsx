@@ -11,7 +11,7 @@ import '@/style/fullscreen.css';
 
 import '@/i18n/i18next.config.mjs';
 
-export default function App({ roomID, board, hand, state, playability }: ServerSideProps) {
+export default function App({ roomID, board, hand, state, playability, player, currentPlayer }: ServerSideProps) {
   return <>
     <Document>
       <Head>
@@ -32,6 +32,8 @@ export default function App({ roomID, board, hand, state, playability }: ServerS
         state={state}
         playability={playability}
         roomID={roomID}
+        player={player}
+        currentPlayer={currentPlayer}
       ></TicGame>
 
     </Document>

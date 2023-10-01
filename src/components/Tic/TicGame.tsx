@@ -20,11 +20,13 @@ type Props = {
   board?: TicBoardState;
   playability?: CardPlayabilityMap;
   roomID: string;
+  player: number;
+  currentPlayer: number;
 };
 
 export const GameManagerContext = createContext<GameManager | []>([]);
 
-export function TicGame({ hand, state, board, playability, roomID }: Props) {
+export function TicGame({ hand, state, board, playability, roomID, player, currentPlayer }: Props) {
 
   const GameManager = useReducer(GameManagerReducer, {
     cardsActive: state?.type == 'choose',
@@ -32,7 +34,9 @@ export function TicGame({ hand, state, board, playability, roomID }: Props) {
     hand,
     state,
     board,
-    playability
+    playability,
+    player,
+    currentPlayer
   });
 
   const sse = useServerSentEvents(`${API_PREFIX}/${roomID}`);

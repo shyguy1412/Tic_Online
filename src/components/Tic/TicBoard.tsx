@@ -8,6 +8,7 @@ import { TicGoal } from "@/components/Tic/TicGoal";
 import '@/components/Tic/style/Tic.css';
 import { useContext } from "preact/hooks";
 import { GameManagerContext } from "@/components/Tic/TicGame";
+import { cycleArray } from "@/components/Tic/lib/CycleArray";
 
 type Props = {
 };
@@ -22,17 +23,15 @@ export function TicBoard({ }: Props) {
 
 
     <div className="tic-goal-wrapper">
-      <TicGoal marbles={GameState?.board?.goals[0] ?? []}></TicGoal>
-      <TicGoal marbles={GameState?.board?.goals[1] ?? []}></TicGoal>
-      <TicGoal marbles={GameState?.board?.goals[2] ?? []}></TicGoal>
-      <TicGoal marbles={GameState?.board?.goals[3] ?? []}></TicGoal>
+      {
+        cycleArray(GameState?.board?.goals.map((m, i) => <TicGoal marbles={m} owner={i} key={i}></TicGoal>) ?? [], ((((GameState?.player ?? 0) + 2) % 4)))
+      }
     </div>
 
     <div className="tic-home-wrapper">
-      <TicHome marbles={GameState?.board?.homes[0] ?? []}></TicHome>
-      <TicHome marbles={GameState?.board?.homes[1] ?? []}></TicHome>
-      <TicHome marbles={GameState?.board?.homes[2] ?? []}></TicHome>
-      <TicHome marbles={GameState?.board?.homes[3] ?? []}></TicHome>
+      {
+        cycleArray(GameState?.board?.homes.map((m, i) => <TicHome marbles={m} owner={i} key={i}></TicHome>) ?? [], ((((GameState?.player ?? 0) + 2) % 4)))
+      }
     </div>
 
     <TicCenter card={GameState?.board?.center}></TicCenter>

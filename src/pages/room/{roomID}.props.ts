@@ -19,6 +19,8 @@ export default async function getServerSideProps(req: Request, res: Response) {
     const hand = getUserHand(userID, room);
     const state = getUserState(userID, room);
     const playability = getPlayability(userID, room);
+    const player = getUserPlayer(userID, room);
+    const currentPlayer = room.state.currentPlayer;
 
     return {
       props: {
@@ -26,18 +28,21 @@ export default async function getServerSideProps(req: Request, res: Response) {
         state,
         hand,
         playability,
+        player,
+        currentPlayer,
         roomID: req.params.roomID
       }
     };
 
   } catch (_) {
     return {
-      props: {
-        roomID: req.params.roomID
-      }
+      // props: {
+      //   roomID: req.params.roomID
+      // }
+      redirect: '/reset'
     };
   }
 
 }
 
-export type ServerSideProps = Awaited<ReturnType<typeof getServerSideProps>>['props'];
+export type ServerSideProps = NonNullable<Awaited<ReturnType<typeof getServerSideProps>>['props']>;

@@ -1,7 +1,7 @@
 import { Modal } from "@/components/Modal";
 import { PlayabilityResult } from "@/lib/tic/types/PlayabilityResult";
 import { TicCard } from "@/lib/tic/types/TicCard";
-import { faBolt, faBrain, faCheck, faHandHoldingMedical, faQuestion, faRotateLeft, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faBolt, faBrain, faCheck, faForward, faHandHoldingMedical, faQuestion, faRotateLeft, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FunctionComponent, h } from "preact";
 import { useContext, useState } from "preact/hooks";

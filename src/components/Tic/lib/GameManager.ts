@@ -13,6 +13,8 @@ const {
 export interface GameManagerState {
   cardsActive: boolean;
   selectedCard: TicCard | null;
+  player: number;
+  currentPlayer: number;
   hand?: TicCard[];
   state?: TicPlayerState;
   board?: TicBoardState;

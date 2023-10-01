@@ -76,11 +76,18 @@
 
 .tic-home-wrapper>.tic-home:nth-child(3) {
   align-self: flex-end;
+  justify-self: end;
+
+  grid-row: 2/2;
+  grid-column: 2/2;
 }
 
 .tic-home-wrapper>.tic-home:nth-child(4) {
-  justify-self: end;
+  justify-self: start;
   align-self: flex-end;
+
+  grid-row: 2/2;
+  grid-column: 1/2;
 }
 
 .tic-home {
@@ -126,15 +133,20 @@
 }
 
 .tic-goal-wrapper>.tic-goal:nth-child(3) {
-  flex-direction: row;
-  justify-self: end;
-  transform: translate(calc(var(--board-size) * var(--goal-offset) * -1), calc(var(--board-size) * var(--marble-size)/2 * -1));
-}
-
-.tic-goal-wrapper>.tic-goal:nth-child(4) {
   flex-direction: column-reverse;
   align-self: flex-start;
   transform: translate(calc(var(--board-size) * var(--marble-size)/2 * -1), calc(var(--board-size) * var(--goal-offset)));
+  grid-row: 2/2;
+  grid-column: 2/2;
+}
+
+.tic-goal-wrapper>.tic-goal:nth-child(4) {
+  flex-direction: row;
+  justify-self: end;
+  align-self: start;
+  transform: translate(calc(var(--board-size) * var(--goal-offset) * -1), calc(var(--board-size) * var(--marble-size)/2 * -1));
+  grid-row: 2/2;
+  grid-column: 1/2;
 }
 
 .tic-center {
@@ -165,7 +177,7 @@
   height: calc(var(--board-size) * var(--marble-size));
 }
 
-.tic-marble-selectable{
+.tic-marble-selectable {
   border-color: white;
 }
 

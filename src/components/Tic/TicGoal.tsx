@@ -4,6 +4,7 @@ import { h } from "preact";
 
 type Props = {
   marbles: (TicMarble|null)[];
+  owner: number;
 };
 
 export function TicGoal({ marbles }: Props) {

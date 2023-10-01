@@ -22,13 +22,14 @@ const SelectMoveMap: { [key in TicCard['type']]: (marble: TicMarble, value: numb
     if (!board) throw new Error("No Field to play in");
     if (playerState?.type != 'play') throw new Error('Not this players turn');
 
-    board.field
+    const targetMarble = board.field
       .filter(m => playerState.validMarbles.some(vm => vm == m?.id))
-      .forEach(marble => { // for each marble that can be moved
-        if (!marble) throw new Error("Can not create preview of empty field");
-        const pos = room.state.board?.field.indexOf(marble) ?? 0;
-        board.field[(pos + value + 60) % 60] = createPreviewMarble(marble, 'move', value);
-      });
+      .find(m => m?.id == marble.id);
+    // .forEach(marble => { // for each marble that can be moved
+    if (!targetMarble) throw new Error("Can not create preview of empty field");
+    const pos = room.state.board?.field.indexOf(targetMarble) ?? 0;
+    board.field[(pos + value + 60) % 60] = createPreviewMarble(targetMarble, 'move', value);
+    // });
   },
   split: function (marble, value, room): void {
     const state = room.users[room.state.currentPlayer].state;

@@ -54,7 +54,7 @@ export function generateNewGame(): TicGameState {
         generateMarbles(2, '#0000ff'),
         generateMarbles(3, '#ffff00'),
       ],
-      goals: [generateSlots(4), generateSlots(4), generateSlots(4), generateSlots(4)],
+      goals: [[...generateSlots(3), { id: v4(), color: '#ff0000', player: 0 }], [...generateSlots(3), { id: v4(), color: '#00ff00', player: 1 }], [...generateSlots(3), { id: v4(), color: '#0000ff', player: 2 }], [...generateSlots(3), { id: v4(), color: '#ffff00', player: 3 }]],
       field: generateSlots(60),
       center: undefined
     },
