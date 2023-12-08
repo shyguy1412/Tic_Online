@@ -11,7 +11,7 @@ function generateMarbles(player: number, color: string): TicMarble[] {
     { id: v4(), color, player },
     { id: v4(), color, player },
     { id: v4(), color, player },
-    { id: v4(), color, player }
+    // { id: v4(), color, player }
   ];
 }
 
@@ -111,7 +111,7 @@ function getPlayerMarbles(player: number, state: TicGameState) {
   state.board.field.filter(m => m?.player == player).forEach(m => m && marbles.push({
     ...m,
     meta: {
-      hasMoved: m.meta?.hasMoved,
+      hasMoved: m.meta?.hasMoved ?? false,
       pos: state.board.field.indexOf(m)
     }
   }));
@@ -215,7 +215,7 @@ export function getPlayability(userID: string, room: IRoom, card?: TicCard): Car
   const player = getUserPlayer(userID, room);
   const state = room.state;
 
-  let marbles = state.board.goals[player].every(m => !m) ? //player is not done
+  let marbles = state.board.goals[player].some(m => !m) ? //player is not done
     getPlayerMarbles(player, state) : getPlayerMarbles(getTeammate(player), state);
 
   if (marbles.every(m => m.meta?.done)) {
@@ -238,7 +238,7 @@ export function getPlayability(userID: string, room: IRoom, card?: TicCard): Car
         };
       }
       const movableMarbles = marbles.filter(m => canMarbleMove(m, value, state)).map(m => m.id);
-      
+
       if (movableMarbles.length == 0) { // Marbles need to be able to move the amount of spaces
         return {
           playable: false,
@@ -320,6 +320,12 @@ export function getPlayability(userID: string, room: IRoom, card?: TicCard): Car
           reasons: ["You do not have a marble in play"]
         };
       }
+      if (marblesInPlayingArea < 2){
+        return {
+          playable: false,
+          reasons: ["There need to be at least 2 marbles in play in order to play this card"]
+        };
+      }
       return {
         playable: true,
         marbles: state.board.field.filter(m => m?.player == player).map(m => m!.id)
@@ -341,7 +347,7 @@ export function getPlayability(userID: string, room: IRoom, card?: TicCard): Car
       if (marblesInPlayingArea < 2) {
         return {
           playable: false,
-          reasons: ["There need to be at least 2 marbles in play in order to swap them"]
+          reasons: ["There need to be at least 2 marbles in play in order to play this card"]
         };
       }
       return {
@@ -363,8 +369,9 @@ export function getPlayability(userID: string, room: IRoom, card?: TicCard): Car
   const playability: CardPlayabilityMap = (card ? [card] : state.hands[player])
     .map(({ type, value, id }) => ({
       id,
-      playability: playabilityMap[type](value ?? -1)
-    })).reduce<CardPlayabilityMap>((prev, cur) => { prev[cur.id] = cur.playability; return prev; }, {});
+      playability: playabilityMap[type](value ?? -1),
+      type //!DEBUG INFO
+    })).reduce<CardPlayabilityMap>((prev, cur) => { prev[cur.id] = cur.playability; prev[cur.id]['type'] = cur.type; return prev; }, {});
 
   return playability;
 };
